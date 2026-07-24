@@ -3,7 +3,6 @@ package com.pacho.appregisoc.ui.features.player
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -12,16 +11,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import com.pacho.appregisoc.domain.model.Player
+import com.pacho.appregisoc.data.dto.PlayerResponse
 import com.pacho.appregisoc.ui.components.PlayerCard
 
 @Composable
 fun PlayerListScreen(
     uiState: PlayerUiState,
     onAddPlayer: () -> Unit,
-    onEditPlayer: (Player) -> Unit,
-    onDeletePlayer: (String) -> Unit,
-    onViewPlayer: (Player) -> Unit
+    onEditPlayer: (PlayerResponse) -> Unit,
+    onDeletePlayer: (Long) -> Unit,
+    onViewPlayer: (PlayerResponse) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
@@ -32,7 +31,7 @@ fun PlayerListScreen(
                 shape = androidx.compose.foundation.shape.CircleShape
             ) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Add,
+                    imageVector = Icons.Default.Add,
                     contentDescription = "Agregar jugador"
                 )
             }
@@ -84,8 +83,8 @@ fun PlayerListScreen(
 }
 
 private val mockPlayers = listOf(
-    Player("1", "Juan", "Pérez", "12345678", 946684800000L, 25),
-    Player("2", "María", "García", "87654321", 883612800000L, 28)
+    PlayerResponse(id = 1, clubId = 1, firstName = "Juan", lastName = "Pérez", documentNumber = "12345678", age = 25, dateOfBirth = "2000-01-15"),
+    PlayerResponse(id = 2, clubId = 1, firstName = "María", lastName = "García", documentNumber = "87654321", age = 28, dateOfBirth = "1997-05-20")
 )
 
 @Preview

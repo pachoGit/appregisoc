@@ -39,7 +39,7 @@ fun PlayerCreateScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    formState = formState.copy(birthDate = datePickerState.selectedDateMillis ?: 0L)
+                    formState = formState.copy(dateOfBirth = datePickerState.selectedDateMillis?.toString() ?: "")
                     showDatePicker = false
                 }) { Text("OK") }
             },
@@ -54,7 +54,7 @@ fun PlayerCreateScreen(
         onCancel = onCancel,
         onSave = {
             val validation = PlayerValidator.validate(
-                formState.firstNames, formState.lastNames, formState.dni, formState.age, formState.birthDate
+                formState.firstName, formState.lastName, formState.documentNumber, formState.age, formState.dateOfBirth
             )
             if (validation.isValid) onSave(formState)
             else formState = formState.copy(errors = validation.errors)

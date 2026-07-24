@@ -30,45 +30,45 @@ fun PlayerFormBody(
         )
 
         OutlinedTextField(
-            value = formState.firstNames,
+            value = formState.firstName,
             onValueChange = {
-                onValueChange(formState.copy(firstNames = it, errors = formState.errors - "firstNames"))
+                onValueChange(formState.copy(firstName = it, errors = formState.errors - "firstName"))
             },
             label = { Text("Nombres") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            isError = formState.errors.containsKey("firstNames"),
-            supportingText = formState.errors["firstNames"]?.let {
+            isError = formState.errors.containsKey("firstName"),
+            supportingText = formState.errors["firstName"]?.let {
                 { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         )
 
         OutlinedTextField(
-            value = formState.lastNames,
+            value = formState.lastName,
             onValueChange = {
-                onValueChange(formState.copy(lastNames = it, errors = formState.errors - "lastNames"))
+                onValueChange(formState.copy(lastName = it, errors = formState.errors - "lastName"))
             },
             label = { Text("Apellidos") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            isError = formState.errors.containsKey("lastNames"),
-            supportingText = formState.errors["lastNames"]?.let {
+            isError = formState.errors.containsKey("lastName"),
+            supportingText = formState.errors["lastName"]?.let {
                 { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         )
 
         OutlinedTextField(
-            value = formState.dni,
+            value = formState.documentNumber,
             onValueChange = {
                 if (it.all { c -> c.isDigit() } && it.length <= 8) {
-                    onValueChange(formState.copy(dni = it, errors = formState.errors - "dni"))
+                    onValueChange(formState.copy(documentNumber = it, errors = formState.errors - "documentNumber"))
                 }
             },
             label = { Text("DNI") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            isError = formState.errors.containsKey("dni"),
-            supportingText = formState.errors["dni"]?.let {
+            isError = formState.errors.containsKey("documentNumber"),
+            supportingText = formState.errors["documentNumber"]?.let {
                 { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         )
@@ -95,7 +95,7 @@ fun PlayerFormBody(
                 .clickable { onShowDatePicker() },
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (formState.errors.containsKey("birthDate"))
+                containerColor = if (formState.errors.containsKey("dateOfBirth"))
                     MaterialTheme.colorScheme.errorContainer
                 else MaterialTheme.colorScheme.surface
             )
@@ -108,9 +108,9 @@ fun PlayerFormBody(
             ) {
                 Text("Fecha de Nacimiento", style = MaterialTheme.typography.bodyLarge)
                 Text(
-                    if (formState.birthDate == 0L) "Seleccionar"
+                    if (formState.dateOfBirth.isBlank()) "Seleccionar"
                     else "Seleccionada",
-                    color = if (formState.birthDate == 0L)
+                    color = if (formState.dateOfBirth.isBlank())
                         MaterialTheme.colorScheme.onSurfaceVariant
                     else MaterialTheme.colorScheme.primary
                 )

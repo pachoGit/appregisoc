@@ -9,7 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pacho.appregisoc.domain.model.Player
+import com.pacho.appregisoc.data.dto.PlayerResponse
 import com.pacho.appregisoc.domain.model.PlayerValidator
 import com.pacho.appregisoc.ui.components.FormScaffold
 import com.pacho.appregisoc.ui.components.PhotoPickerState
@@ -18,7 +18,7 @@ import com.pacho.appregisoc.ui.components.rememberImagePickerLauncher
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerEditScreen(
-    player: Player,
+    player: PlayerResponse,
     onSave: (PlayerFormState) -> Unit,
     onCancel: () -> Unit,
     onUploadPhoto: (ByteArray, String, PhotoType, (PhotoPickerState) -> Unit) -> Unit = { _, _, _, _ -> }
@@ -26,7 +26,7 @@ fun PlayerEditScreen(
     var formState by remember { mutableStateOf(PlayerFormState.fromPlayer(player)) }
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = formState.birthDate.takeIf { it != 0L }
+        initialSelectedDateMillis = formState.dateOfBirth.takeIf { it.isNotBlank() }?.let { null }
     )
     var activePhotoType by remember { mutableStateOf<PhotoType?>(null) }
 
@@ -43,7 +43,7 @@ fun PlayerEditScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    formState = formState.copy(birthDate = datePickerState.selectedDateMillis ?: 0L)
+                    formState = formState.copy(dateOfBirth = datePickerState.selectedDateMillis?.toString() ?: "")
                     showDatePicker = false
                 }) { Text("OK") }
             },
@@ -58,7 +58,7 @@ fun PlayerEditScreen(
         onCancel = onCancel,
         onSave = {
             val validation = PlayerValidator.validate(
-                formState.firstNames, formState.lastNames, formState.dni, formState.age, formState.birthDate
+                formState.firstName, formState.lastName, formState.documentNumber, formState.age, formState.dateOfBirth
             )
             if (validation.isValid) onSave(formState)
             else formState = formState.copy(errors = validation.errors)
@@ -85,7 +85,7 @@ fun PlayerEditScreen(
 private fun PlayerEditScreenPreview() {
     MaterialTheme {
         PlayerEditScreen(
-            player = Player("1", "Juan", "Pérez", "12345678", 946684800000L, 25),
+            player = PlayerResponse(id = 1, clubId = 1, firstName = "Juan", lastName = "Pérez", documentNumber = "12345678", age = 25, dateOfBirth = "2000-01-15"),
             onSave = {},
             onCancel = {}
         )

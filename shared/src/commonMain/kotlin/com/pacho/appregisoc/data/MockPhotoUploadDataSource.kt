@@ -1,4 +1,4 @@
-package com.pacho.appregisoc.data.datasource
+package com.pacho.appregisoc.data
 
 import com.pacho.appregisoc.core.Result
 import kotlinx.coroutines.delay

@@ -1,7 +1,7 @@
 package com.pacho.appregisoc.domain.usecase
 
 import com.pacho.appregisoc.core.Result
-import com.pacho.appregisoc.data.datasource.PhotoUploadDataSource
+import com.pacho.appregisoc.data.PhotoUploadDataSource
 
 class UploadPhotoUseCase(
     private val photoUploadDataSource: PhotoUploadDataSource

@@ -1,37 +1,42 @@
 package com.pacho.appregisoc.ui.features.player
 
-import com.pacho.appregisoc.domain.model.Player
+import com.pacho.appregisoc.data.dto.PlayerPosition
+import com.pacho.appregisoc.data.dto.PlayerResponse
 import com.pacho.appregisoc.ui.components.PhotoPickerState
 
 data class PlayerFormState(
-    val firstNames: String = "",
-    val lastNames: String = "",
-    val dni: String = "",
+    val firstName: String = "",
+    val lastName: String = "",
+    val documentNumber: String = "",
     val age: String = "",
-    val birthDate: Long = 0L,
+    val dateOfBirth: String = "",
     val photoState: PhotoPickerState = PhotoPickerState(),
     val dniFrontPhotoState: PhotoPickerState = PhotoPickerState(),
     val dniBackPhotoState: PhotoPickerState = PhotoPickerState(),
     val errors: Map<String, String> = emptyMap(),
     val isEditing: Boolean = false,
-    val editingPlayerId: String? = null
+    val editingPlayerId: Long? = null,
+    val clubId: Long = 1L,
+    val position: PlayerPosition? = null
 ) {
     val photoUrl: String get() = photoState.remoteUrl ?: ""
-    val dniFrontPhotoUrl: String get() = dniFrontPhotoState.remoteUrl ?: ""
-    val dniBackPhotoUrl: String get() = dniBackPhotoState.remoteUrl ?: ""
+    val documentFrontUrl: String get() = dniFrontPhotoState.remoteUrl ?: ""
+    val documentBackUrl: String get() = dniBackPhotoState.remoteUrl ?: ""
 
     companion object {
-        fun fromPlayer(player: Player) = PlayerFormState(
-            firstNames = player.firstNames,
-            lastNames = player.lastNames,
-            dni = player.dni,
+        fun fromPlayer(player: PlayerResponse) = PlayerFormState(
+            firstName = player.firstName,
+            lastName = player.lastName,
+            documentNumber = player.documentNumber,
             age = player.age.toString(),
-            birthDate = player.birthDate,
+            dateOfBirth = player.dateOfBirth,
             photoState = PhotoPickerState(remoteUrl = player.photoUrl),
-            dniFrontPhotoState = PhotoPickerState(remoteUrl = player.dniFrontPhotoUrl),
-            dniBackPhotoState = PhotoPickerState(remoteUrl = player.dniBackPhotoUrl),
+            dniFrontPhotoState = PhotoPickerState(remoteUrl = player.documentFrontUrl),
+            dniBackPhotoState = PhotoPickerState(remoteUrl = player.documentBackUrl),
             isEditing = true,
-            editingPlayerId = player.id
+            editingPlayerId = player.id,
+            clubId = player.clubId,
+            position = player.position
         )
     }
 }

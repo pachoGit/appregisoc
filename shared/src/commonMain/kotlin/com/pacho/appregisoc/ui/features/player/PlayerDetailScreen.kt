@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pacho.appregisoc.domain.model.Player
+import com.pacho.appregisoc.data.dto.PlayerResponse
 import com.pacho.appregisoc.ui.components.DniPhotoPlaceholder
 import com.pacho.appregisoc.ui.components.InfoRow
 import com.pacho.appregisoc.ui.components.InfoSection
@@ -26,7 +26,7 @@ import com.pacho.appregisoc.ui.components.InfoSection
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerDetailScreen(
-    player: Player,
+    player: PlayerResponse,
     onBack: () -> Unit
 ) {
     Scaffold(
@@ -71,7 +71,7 @@ fun PlayerDetailScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "${player.firstNames} ${player.lastNames}",
+                text = "${player.firstName} ${player.lastName}",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -79,9 +79,9 @@ fun PlayerDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             InfoSection(title = "Datos Personales") {
-                InfoRow(label = "DNI", value = player.dni)
+                InfoRow(label = "DNI", value = player.documentNumber)
                 InfoRow(label = "Edad", value = "${player.age} años")
-                InfoRow(label = "Fecha de Nacimiento", value = formatearFecha(player.birthDate))
+                InfoRow(label = "Fecha de Nacimiento", value = player.dateOfBirth.ifBlank { "No registrada" })
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -89,16 +89,16 @@ fun PlayerDetailScreen(
             InfoSection(title = "Documentación") {
                 Text("DNI Frontal", style = MaterialTheme.typography.bodySmall)
                 Spacer(modifier = Modifier.height(8.dp))
-                if (player.dniFrontPhotoUrl != null) {
-                    PhotoAttachedPlaceholder(url = player.dniFrontPhotoUrl)
+                if (player.documentFrontUrl != null) {
+                    PhotoAttachedPlaceholder(url = player.documentFrontUrl)
                 } else {
                     DniPhotoPlaceholder()
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("DNI Posterior", style = MaterialTheme.typography.bodySmall)
                 Spacer(modifier = Modifier.height(8.dp))
-                if (player.dniBackPhotoUrl != null) {
-                    PhotoAttachedPlaceholder(url = player.dniBackPhotoUrl)
+                if (player.documentBackUrl != null) {
+                    PhotoAttachedPlaceholder(url = player.documentBackUrl)
                 } else {
                     DniPhotoPlaceholder()
                 }
@@ -136,18 +136,11 @@ private fun PhotoAttachedPlaceholder(url: String) {
     }
 }
 
-private fun formatearFecha(timestamp: Long): String {
-    if (timestamp <= 0L) return "No registrada"
-    return "Registrada"
-}
-
-private val previewPlayer = Player(
-    id = "1",
-    firstNames = "Juan",
-    lastNames = "Pérez",
-    dni = "12345678",
-    birthDate = 946684800000L,
-    age = 25
+private val previewPlayer = PlayerResponse(
+    id = 1, clubId = 1,
+    firstName = "Juan", lastName = "Pérez",
+    documentNumber = "12345678",
+    age = 25, dateOfBirth = "2000-01-15"
 )
 
 @Preview
@@ -168,8 +161,8 @@ private fun PlayerDetailScreenWithPhotosPreview() {
         PlayerDetailScreen(
             player = previewPlayer.copy(
                 photoUrl = "https://example.com/photo.jpg",
-                dniFrontPhotoUrl = "https://example.com/dni-front.jpg",
-                dniBackPhotoUrl = "https://example.com/dni-back.jpg"
+                documentFrontUrl = "https://example.com/dni-front.jpg",
+                documentBackUrl = "https://example.com/dni-back.jpg"
             ),
             onBack = {}
         )

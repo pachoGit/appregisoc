@@ -3,7 +3,7 @@ package com.pacho.appregisoc.ui.features.player
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
-import com.pacho.appregisoc.domain.model.Player
+import com.pacho.appregisoc.data.dto.PlayerResponse
 import com.pacho.appregisoc.domain.usecase.DeletePlayerUseCase
 import com.pacho.appregisoc.domain.usecase.GetPlayersUseCase
 import com.pacho.appregisoc.domain.usecase.SavePlayerUseCase
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 sealed class PlayerUiState {
     data object Loading : PlayerUiState()
-    data class Success(val players: List<Player>) : PlayerUiState()
+    data class Success(val players: List<PlayerResponse>) : PlayerUiState()
     data class Error(val message: String) : PlayerUiState()
 }
 
@@ -50,14 +50,16 @@ class PlayerViewModel(
         viewModelScope.launch {
             val result = savePlayerUseCase(
                 id = formState.editingPlayerId,
-                firstNames = formState.firstNames,
-                lastNames = formState.lastNames,
-                dni = formState.dni,
+                firstName = formState.firstName,
+                lastName = formState.lastName,
+                documentNumber = formState.documentNumber,
                 age = formState.age,
-                birthDate = formState.birthDate,
+                dateOfBirth = formState.dateOfBirth,
+                clubId = formState.clubId,
+                position = formState.position,
                 photoUrl = formState.photoUrl.ifBlank { null },
-                dniFrontPhotoUrl = formState.dniFrontPhotoUrl.ifBlank { null },
-                dniBackPhotoUrl = formState.dniBackPhotoUrl.ifBlank { null }
+                documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
+                documentBackUrl = formState.documentBackUrl.ifBlank { null }
             )
             when (result) {
                 is Result.Error -> _snackBarMessage.emit(result.message)
@@ -69,7 +71,7 @@ class PlayerViewModel(
         }
     }
 
-    fun deletePlayer(id: String) {
+    fun deletePlayer(id: Long) {
         viewModelScope.launch {
             val result = deletePlayerUseCase(id)
             when (result) {

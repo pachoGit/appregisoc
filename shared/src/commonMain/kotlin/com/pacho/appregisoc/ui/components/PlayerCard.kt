@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.pacho.appregisoc.domain.model.Player
+import com.pacho.appregisoc.data.dto.PlayerResponse
 
 @Composable
 fun PlayerCard(
-    player: Player,
+    player: PlayerResponse,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onView: () -> Unit,
@@ -32,7 +32,7 @@ fun PlayerCard(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             title = { Text("Confirmar eliminación") },
-            text = { Text("¿Estás seguro de eliminar a ${player.firstNames} ${player.lastNames}?") },
+            text = { Text("¿Estás seguro de eliminar a ${player.firstName} ${player.lastName}?") },
             confirmButton = {
                 TextButton(onClick = {
                     onDelete()
@@ -83,14 +83,14 @@ fun PlayerCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "${player.firstNames} ${player.lastNames}",
+                    text = "${player.firstName} ${player.lastName}",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     ),
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "DNI: ${player.dni}",
+                    text = "DNI: ${player.documentNumber}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
