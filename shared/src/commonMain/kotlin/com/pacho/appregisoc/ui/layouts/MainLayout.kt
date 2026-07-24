@@ -30,9 +30,11 @@ fun MainLayout(
     onLogoClick: () -> Unit = {},
     selectedTab: Int = 0,
     onTabSelected: (Int) -> Unit = {},
+    snackbarHost: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        snackbarHost = snackbarHost,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -95,8 +97,8 @@ fun MainLayout(
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { onTabSelected(2) },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Jugadores") },
-                    label = { Text("Jugadores") }
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Players") },
+                    label = { Text("Players") }
                 )
             }
         }
