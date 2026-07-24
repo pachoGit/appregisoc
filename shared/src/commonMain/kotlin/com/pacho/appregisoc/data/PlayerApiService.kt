@@ -21,11 +21,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class PlayerApiService(private val client: HttpClient) : PlayerRepository {
-
-    companion object {
-        private const val BASE_URL = "http://localhost:8080/api/players"
-    }
+class PlayerApiService(
+    private val client: HttpClient,
+    private val baseUrl: String = "http://localhost:8080/api/players"
+) : PlayerRepository {
 
     private val playersFlow = MutableStateFlow<List<PlayerResponse>>(emptyList())
 
@@ -34,7 +33,7 @@ class PlayerApiService(private val client: HttpClient) : PlayerRepository {
     override suspend fun getById(id: Long): Result<PlayerResponse?> {
         return try {
             val response = client.get {
-                url("$BASE_URL/$id")
+                url("$baseUrl/$id")
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al obtener jugador: ${response.status}")
@@ -48,7 +47,7 @@ class PlayerApiService(private val client: HttpClient) : PlayerRepository {
     override suspend fun getByClub(clubId: Long): Result<List<PlayerResponse>> {
         return try {
             val response = client.get {
-                url(BASE_URL) {
+                url(baseUrl) {
                     parameters.append("clubId", clubId.toString())
                 }
             }
@@ -66,7 +65,7 @@ class PlayerApiService(private val client: HttpClient) : PlayerRepository {
     override suspend fun createPlayer(player: PlayerResponse): Result<PlayerResponse> {
         return try {
             val response = client.post {
-                url(BASE_URL)
+                url(baseUrl)
                 contentType(ContentType.Application.Json)
                 setBody(
                     PlayerRequest(
@@ -97,7 +96,7 @@ class PlayerApiService(private val client: HttpClient) : PlayerRepository {
     override suspend fun updatePlayer(id: Long, player: PlayerResponse): Result<Unit> {
         return try {
             val response = client.put {
-                url("$BASE_URL/$id")
+                url("$baseUrl/$id")
                 contentType(ContentType.Application.Json)
                 setBody(
                     PlayerUpdateRequest(
@@ -128,7 +127,7 @@ class PlayerApiService(private val client: HttpClient) : PlayerRepository {
     override suspend fun deletePlayer(id: Long): Result<Unit> {
         return try {
             val response = client.delete {
-                url("$BASE_URL/$id")
+                url("$baseUrl/$id")
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al eliminar jugador: ${response.status}")

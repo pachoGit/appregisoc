@@ -109,7 +109,7 @@ fun PlayerFormBody(
                 Text("Fecha de Nacimiento", style = MaterialTheme.typography.bodyLarge)
                 Text(
                     if (formState.dateOfBirth.isBlank()) "Seleccionar"
-                    else "Seleccionada",
+                    else formState.dateOfBirth,
                     color = if (formState.dateOfBirth.isBlank())
                         MaterialTheme.colorScheme.onSurfaceVariant
                     else MaterialTheme.colorScheme.primary

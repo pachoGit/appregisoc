@@ -39,7 +39,7 @@ fun PlayerCreateScreen(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    formState = formState.copy(dateOfBirth = datePickerState.selectedDateMillis?.toString() ?: "")
+                    formState = formState.copy(dateOfBirth = datePickerState.selectedDateMillis?.toDateString() ?: "")
                     showDatePicker = false
                 }) { Text("OK") }
             },
