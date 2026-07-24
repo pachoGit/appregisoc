@@ -7,6 +7,8 @@ import com.pacho.appregisoc.domain.model.Player
 import com.pacho.appregisoc.domain.usecase.DeletePlayerUseCase
 import com.pacho.appregisoc.domain.usecase.GetPlayersUseCase
 import com.pacho.appregisoc.domain.usecase.SavePlayerUseCase
+import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
+import com.pacho.appregisoc.ui.components.PhotoPickerState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -19,7 +21,8 @@ sealed class PlayerUiState {
 class PlayerViewModel(
     private val getPlayersUseCase: GetPlayersUseCase,
     private val savePlayerUseCase: SavePlayerUseCase,
-    private val deletePlayerUseCase: DeletePlayerUseCase
+    private val deletePlayerUseCase: DeletePlayerUseCase,
+    private val uploadPhotoUseCase: UploadPhotoUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PlayerUiState>(PlayerUiState.Loading)
@@ -52,9 +55,9 @@ class PlayerViewModel(
                 dni = formState.dni,
                 age = formState.age,
                 birthDate = formState.birthDate,
-                photoUrl = formState.photoUrl,
-                dniFrontPhotoUrl = formState.dniFrontPhotoUrl,
-                dniBackPhotoUrl = formState.dniBackPhotoUrl
+                photoUrl = formState.photoUrl.ifBlank { null },
+                dniFrontPhotoUrl = formState.dniFrontPhotoUrl.ifBlank { null },
+                dniBackPhotoUrl = formState.dniBackPhotoUrl.ifBlank { null }
             )
             when (result) {
                 is Result.Error -> _snackBarMessage.emit(result.message)
@@ -72,6 +75,29 @@ class PlayerViewModel(
             when (result) {
                 is Result.Error -> _snackBarMessage.emit(result.message)
                 is Result.Success -> _snackBarMessage.emit("Jugador eliminado")
+            }
+        }
+    }
+
+    fun uploadPhoto(
+        imageBytes: ByteArray,
+        fileName: String,
+        photoType: PhotoType,
+        onStateUpdate: (PhotoPickerState) -> Unit
+    ) {
+        viewModelScope.launch {
+            onStateUpdate(PhotoPickerState(isUploading = true))
+
+            val result = uploadPhotoUseCase(imageBytes, fileName)
+            when (result) {
+                is Result.Error -> {
+                    onStateUpdate(PhotoPickerState(error = result.message))
+                    _snackBarMessage.emit(result.message)
+                }
+                is Result.Success -> {
+                    onStateUpdate(PhotoPickerState(remoteUrl = result.data))
+                    _snackBarMessage.emit("Foto subida correctamente")
+                }
             }
         }
     }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pacho.appregisoc.di.AppModule
-import com.pacho.appregisoc.domain.model.Player
 import com.pacho.appregisoc.ui.features.player.*
 import com.pacho.appregisoc.ui.layouts.MainLayout
 import com.pacho.appregisoc.ui.navigation.Screen
@@ -19,7 +18,8 @@ fun App() {
         PlayerViewModel(
             getPlayersUseCase = appModule.getPlayersUseCase,
             savePlayerUseCase = appModule.savePlayerUseCase,
-            deletePlayerUseCase = appModule.deletePlayerUseCase
+            deletePlayerUseCase = appModule.deletePlayerUseCase,
+            uploadPhotoUseCase = appModule.uploadPhotoUseCase
         )
     }
     val uiState by viewModel.uiState.collectAsState()
@@ -45,35 +45,41 @@ fun App() {
                     ) {
                         PlayerListScreen(
                             uiState = uiState,
-                            onAddPlayer = { currentScreen = Screen.PlayerForm },
+                            onAddPlayer = { currentScreen = Screen.PlayerCreate },
                             onEditPlayer = { currentScreen = Screen.PlayerEdit(it) },
                             onDeletePlayer = { viewModel.deletePlayer(it) },
                             onViewPlayer = { currentScreen = Screen.PlayerDetail(it) }
                         )
                     }
                 }
-                is Screen.PlayerForm -> {
-                    PlayerFormScreen(
+                is Screen.PlayerCreate -> {
+                    PlayerCreateScreen(
                         onSave = { formState ->
                             viewModel.savePlayer(formState)
                             currentScreen = Screen.PlayerList
                         },
-                        onCancel = { currentScreen = Screen.PlayerList }
+                        onCancel = { currentScreen = Screen.PlayerList },
+                        onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                            viewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                        }
                     )
                 }
                 is Screen.PlayerEdit -> {
-                    PlayerFormScreen(
-                        player = (currentScreen as Screen.PlayerEdit).player,
+                    PlayerEditScreen(
+                        player = screen.player,
                         onSave = { formState ->
                             viewModel.savePlayer(formState)
                             currentScreen = Screen.PlayerList
                         },
-                        onCancel = { currentScreen = Screen.PlayerList }
+                        onCancel = { currentScreen = Screen.PlayerList },
+                        onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                            viewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                        }
                     )
                 }
                 is Screen.PlayerDetail -> {
                     PlayerDetailScreen(
-                        player = (currentScreen as Screen.PlayerDetail).player,
+                        player = screen.player,
                         onBack = { currentScreen = Screen.PlayerList }
                     )
                 }

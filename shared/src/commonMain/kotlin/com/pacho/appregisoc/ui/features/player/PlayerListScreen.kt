@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.pacho.appregisoc.domain.model.Player
 import com.pacho.appregisoc.ui.components.PlayerCard
 
@@ -79,5 +80,66 @@ fun PlayerListScreen(
                 }
             }
         }
+    }
+}
+
+private val mockPlayers = listOf(
+    Player("1", "Juan", "Pérez", "12345678", 946684800000L, 25),
+    Player("2", "María", "García", "87654321", 883612800000L, 28)
+)
+
+@Preview
+@Composable
+private fun PlayerListScreenSuccessPreview() {
+    MaterialTheme {
+        PlayerListScreen(
+            uiState = PlayerUiState.Success(mockPlayers),
+            onAddPlayer = {},
+            onEditPlayer = {},
+            onDeletePlayer = {},
+            onViewPlayer = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PlayerListScreenEmptyPreview() {
+    MaterialTheme {
+        PlayerListScreen(
+            uiState = PlayerUiState.Success(emptyList()),
+            onAddPlayer = {},
+            onEditPlayer = {},
+            onDeletePlayer = {},
+            onViewPlayer = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PlayerListScreenErrorPreview() {
+    MaterialTheme {
+        PlayerListScreen(
+            uiState = PlayerUiState.Error("Error al cargar jugadores"),
+            onAddPlayer = {},
+            onEditPlayer = {},
+            onDeletePlayer = {},
+            onViewPlayer = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PlayerListScreenLoadingPreview() {
+    MaterialTheme {
+        PlayerListScreen(
+            uiState = PlayerUiState.Loading,
+            onAddPlayer = {},
+            onEditPlayer = {},
+            onDeletePlayer = {},
+            onViewPlayer = {}
+        )
     }
 }
