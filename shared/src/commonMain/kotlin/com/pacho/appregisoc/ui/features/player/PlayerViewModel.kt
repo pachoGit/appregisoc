@@ -28,6 +28,9 @@ class PlayerViewModel(
     private val _uiState = MutableStateFlow<PlayerUiState>(PlayerUiState.Loading)
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
@@ -48,35 +51,45 @@ class PlayerViewModel(
 
     fun savePlayer(formState: PlayerFormState) {
         viewModelScope.launch {
-            val result = savePlayerUseCase(
-                id = formState.editingPlayerId,
-                firstName = formState.firstName,
-                lastName = formState.lastName,
-                documentNumber = formState.documentNumber,
-                age = formState.age,
-                dateOfBirth = formState.dateOfBirth,
-                clubId = formState.clubId,
-                position = formState.position,
-                photoUrl = formState.photoUrl.ifBlank { null },
-                documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
-                documentBackUrl = formState.documentBackUrl.ifBlank { null }
-            )
-            when (result) {
-                is Result.Error -> _snackBarMessage.emit(result.message)
-                is Result.Success -> _snackBarMessage.emit(
-                    if (formState.isEditing) "Jugador actualizado correctamente"
-                    else "Jugador registrado correctamente"
+            _isLoading.value = true
+            try {
+                val result = savePlayerUseCase(
+                    id = formState.editingPlayerId,
+                    firstName = formState.firstName,
+                    lastName = formState.lastName,
+                    documentNumber = formState.documentNumber,
+                    age = formState.age,
+                    dateOfBirth = formState.dateOfBirth,
+                    clubId = formState.clubId,
+                    position = formState.position,
+                    photoUrl = formState.photoUrl.ifBlank { null },
+                    documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
+                    documentBackUrl = formState.documentBackUrl.ifBlank { null }
                 )
+                when (result) {
+                    is Result.Error -> _snackBarMessage.emit(result.message)
+                    is Result.Success -> _snackBarMessage.emit(
+                        if (formState.isEditing) "Jugador actualizado correctamente"
+                        else "Jugador registrado correctamente"
+                    )
+                }
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     fun deletePlayer(id: Long) {
         viewModelScope.launch {
-            val result = deletePlayerUseCase(id)
-            when (result) {
-                is Result.Error -> _snackBarMessage.emit(result.message)
-                is Result.Success -> _snackBarMessage.emit("Jugador eliminado")
+            _isLoading.value = true
+            try {
+                val result = deletePlayerUseCase(id)
+                when (result) {
+                    is Result.Error -> _snackBarMessage.emit(result.message)
+                    is Result.Success -> _snackBarMessage.emit("Jugador eliminado")
+                }
+            } finally {
+                _isLoading.value = false
             }
         }
     }

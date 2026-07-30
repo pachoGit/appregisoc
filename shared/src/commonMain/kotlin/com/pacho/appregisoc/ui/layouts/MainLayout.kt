@@ -91,8 +91,8 @@ fun MainLayout(
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { onTabSelected(1) },
-                    icon = { Icon(Icons.Default.DateRange, contentDescription = "Eventos") },
-                    label = { Text("Eventos") }
+                    icon = { Icon(Icons.Default.DateRange, contentDescription = "Clubs") },
+                    label = { Text("Clubs") }
                 )
                 NavigationBarItem(
                     selected = selectedTab == 2,
