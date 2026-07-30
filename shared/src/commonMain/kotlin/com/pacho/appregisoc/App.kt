@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pacho.appregisoc.di.AppModule
 import com.pacho.appregisoc.ui.components.LoadingOverlay
 import com.pacho.appregisoc.ui.features.club.*
+import com.pacho.appregisoc.ui.features.home.HomeScreen
 import com.pacho.appregisoc.ui.features.player.*
 import com.pacho.appregisoc.ui.layouts.MainLayout
 import com.pacho.appregisoc.ui.navigation.Screen
@@ -41,7 +42,7 @@ fun App() {
     val playerIsLoading by playerViewModel.isLoading.collectAsState()
     val clubIsLoading by clubViewModel.isLoading.collectAsState()
 
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.ClubList) }
+    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -52,10 +53,10 @@ fun App() {
 
     fun onTabSelected(tab: Int) {
         currentScreen = when (tab) {
-            0 -> Screen.ClubList
+            0 -> Screen.Home
             1 -> Screen.ClubList
             2 -> Screen.PlayerList
-            else -> Screen.ClubList
+            else -> Screen.Home
         }
     }
 
@@ -63,6 +64,19 @@ fun App() {
         LoadingOverlay(isLoading = playerIsLoading || clubIsLoading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 when (val screen = currentScreen) {
+                    is Screen.Home -> {
+                        MainLayout(
+                            title = "Inicio",
+                            selectedTab = 0,
+                            onTabSelected = ::onTabSelected,
+                            snackbarHost = { SnackbarHost(snackbarHostState) }
+                        ) {
+                            HomeScreen(
+                                uiState = clubUiState,
+                                onViewClub = { currentScreen = Screen.ClubDetail(it) }
+                            )
+                        }
+                    }
                     is Screen.ClubList -> {
                         MainLayout(
                             title = "Clubs",
