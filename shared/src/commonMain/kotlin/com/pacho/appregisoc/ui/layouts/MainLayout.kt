@@ -97,8 +97,8 @@ fun MainLayout(
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { onTabSelected(2) },
-                    icon = { Icon(Icons.Default.Person, contentDescription = "Players") },
-                    label = { Text("Players") }
+                    icon = { Icon(Icons.Default.Person, contentDescription = "Plantilla") },
+                    label = { Text("Plantilla") }
                 )
             }
         }

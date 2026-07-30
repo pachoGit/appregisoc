@@ -9,8 +9,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pacho.appregisoc.di.AppModule
 import com.pacho.appregisoc.ui.components.LoadingOverlay
 import com.pacho.appregisoc.ui.features.club.*
+import com.pacho.appregisoc.ui.features.coach.*
 import com.pacho.appregisoc.ui.features.home.HomeScreen
+import com.pacho.appregisoc.ui.features.physicaltrainer.*
 import com.pacho.appregisoc.ui.features.player.*
+import com.pacho.appregisoc.ui.features.staff.StaffScreen
 import com.pacho.appregisoc.ui.layouts.MainLayout
 import com.pacho.appregisoc.ui.navigation.Screen
 import kotlinx.coroutines.flow.merge
@@ -36,17 +39,42 @@ fun App() {
             uploadPhotoUseCase = appModule.uploadPhotoUseCase
         )
     }
+    val coachViewModel: CoachViewModel = viewModel {
+        CoachViewModel(
+            getCoachesUseCase = appModule.getCoachesUseCase,
+            saveCoachUseCase = appModule.saveCoachUseCase,
+            deleteCoachUseCase = appModule.deleteCoachUseCase
+        )
+    }
+    val physicalTrainerViewModel: PhysicalTrainerViewModel = viewModel {
+        PhysicalTrainerViewModel(
+            getPhysicalTrainersUseCase = appModule.getPhysicalTrainersUseCase,
+            savePhysicalTrainerUseCase = appModule.savePhysicalTrainerUseCase,
+            deletePhysicalTrainerUseCase = appModule.deletePhysicalTrainerUseCase
+        )
+    }
 
     val playerUiState by playerViewModel.uiState.collectAsState()
     val clubUiState by clubViewModel.uiState.collectAsState()
+    val coachUiState by coachViewModel.uiState.collectAsState()
+    val physicalTrainerUiState by physicalTrainerViewModel.uiState.collectAsState()
+
     val playerIsLoading by playerViewModel.isLoading.collectAsState()
     val clubIsLoading by clubViewModel.isLoading.collectAsState()
+    val coachIsLoading by coachViewModel.isLoading.collectAsState()
+    val physicalTrainerIsLoading by physicalTrainerViewModel.isLoading.collectAsState()
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
+    var selectedStaffTab by remember { mutableStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        merge(playerViewModel.snackBarMessage, clubViewModel.snackBarMessage).collect { message ->
+        merge(
+            playerViewModel.snackBarMessage,
+            clubViewModel.snackBarMessage,
+            coachViewModel.snackBarMessage,
+            physicalTrainerViewModel.snackBarMessage
+        ).collect { message ->
             snackbarHostState.showSnackbar(message)
         }
     }
@@ -55,13 +83,14 @@ fun App() {
         currentScreen = when (tab) {
             0 -> Screen.Home
             1 -> Screen.ClubList
-            2 -> Screen.PlayerList
+            2 -> Screen.Staff
             else -> Screen.Home
         }
     }
 
     MaterialTheme {
-        LoadingOverlay(isLoading = playerIsLoading || clubIsLoading) {
+        val isLoading = playerIsLoading || clubIsLoading || coachIsLoading || physicalTrainerIsLoading
+        LoadingOverlay(isLoading = isLoading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 when (val screen = currentScreen) {
                     is Screen.Home -> {
@@ -124,6 +153,34 @@ fun App() {
                             onBack = { currentScreen = Screen.ClubList }
                         )
                     }
+                    is Screen.Staff -> {
+                        MainLayout(
+                            title = "Plantilla",
+                            selectedTab = 2,
+                            onTabSelected = ::onTabSelected,
+                            snackbarHost = { SnackbarHost(snackbarHostState) }
+                        ) {
+                            StaffScreen(
+                                selectedTab = selectedStaffTab,
+                                onTabSelected = { selectedStaffTab = it },
+                                playerUiState = playerUiState,
+                                coachUiState = coachUiState,
+                                physicalTrainerUiState = physicalTrainerUiState,
+                                onAddPlayer = { currentScreen = Screen.PlayerCreate },
+                                onEditPlayer = { currentScreen = Screen.PlayerEdit(it) },
+                                onDeletePlayer = { playerViewModel.deletePlayer(it) },
+                                onViewPlayer = { currentScreen = Screen.PlayerDetail(it) },
+                                onAddCoach = { currentScreen = Screen.CoachCreate },
+                                onEditCoach = { currentScreen = Screen.CoachEdit(it) },
+                                onDeleteCoach = { coachViewModel.deleteCoach(it) },
+                                onViewCoach = { currentScreen = Screen.CoachDetail(it) },
+                                onAddTrainer = { currentScreen = Screen.PhysicalTrainerCreate },
+                                onEditTrainer = { currentScreen = Screen.PhysicalTrainerEdit(it) },
+                                onDeleteTrainer = { physicalTrainerViewModel.deletePhysicalTrainer(it) },
+                                onViewTrainer = { currentScreen = Screen.PhysicalTrainerDetail(it) }
+                            )
+                        }
+                    }
                     is Screen.PlayerList -> {
                         MainLayout(
                             title = "Jugadores",
@@ -144,9 +201,9 @@ fun App() {
                         PlayerCreateScreen(
                             onSave = { formState ->
                                 playerViewModel.savePlayer(formState)
-                                currentScreen = Screen.PlayerList
+                                currentScreen = Screen.Staff
                             },
-                            onCancel = { currentScreen = Screen.PlayerList },
+                            onCancel = { currentScreen = Screen.Staff },
                             onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
                                 playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
                             }
@@ -157,9 +214,9 @@ fun App() {
                             player = screen.player,
                             onSave = { formState ->
                                 playerViewModel.savePlayer(formState)
-                                currentScreen = Screen.PlayerList
+                                currentScreen = Screen.Staff
                             },
-                            onCancel = { currentScreen = Screen.PlayerList },
+                            onCancel = { currentScreen = Screen.Staff },
                             onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
                                 playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
                             }
@@ -168,7 +225,57 @@ fun App() {
                     is Screen.PlayerDetail -> {
                         PlayerDetailScreen(
                             player = screen.player,
-                            onBack = { currentScreen = Screen.PlayerList }
+                            onBack = { currentScreen = Screen.Staff }
+                        )
+                    }
+                    is Screen.CoachCreate -> {
+                        CoachCreateScreen(
+                            onSave = { formState ->
+                                coachViewModel.saveCoach(formState)
+                                currentScreen = Screen.Staff
+                            },
+                            onCancel = { currentScreen = Screen.Staff }
+                        )
+                    }
+                    is Screen.CoachEdit -> {
+                        CoachEditScreen(
+                            coach = screen.coach,
+                            onSave = { formState ->
+                                coachViewModel.saveCoach(formState)
+                                currentScreen = Screen.Staff
+                            },
+                            onCancel = { currentScreen = Screen.Staff }
+                        )
+                    }
+                    is Screen.CoachDetail -> {
+                        CoachDetailScreen(
+                            coach = screen.coach,
+                            onBack = { currentScreen = Screen.Staff }
+                        )
+                    }
+                    is Screen.PhysicalTrainerCreate -> {
+                        PhysicalTrainerCreateScreen(
+                            onSave = { formState ->
+                                physicalTrainerViewModel.savePhysicalTrainer(formState)
+                                currentScreen = Screen.Staff
+                            },
+                            onCancel = { currentScreen = Screen.Staff }
+                        )
+                    }
+                    is Screen.PhysicalTrainerEdit -> {
+                        PhysicalTrainerEditScreen(
+                            entity = screen.trainer,
+                            onSave = { formState ->
+                                physicalTrainerViewModel.savePhysicalTrainer(formState)
+                                currentScreen = Screen.Staff
+                            },
+                            onCancel = { currentScreen = Screen.Staff }
+                        )
+                    }
+                    is Screen.PhysicalTrainerDetail -> {
+                        PhysicalTrainerDetailScreen(
+                            entity = screen.trainer,
+                            onBack = { currentScreen = Screen.Staff }
                         )
                     }
                 }

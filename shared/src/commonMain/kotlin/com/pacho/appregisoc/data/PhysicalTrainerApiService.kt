@@ -1,0 +1,136 @@
+package com.pacho.appregisoc.data
+
+import com.pacho.appregisoc.core.Result
+import com.pacho.appregisoc.data.dto.PhysicalTrainerRequest
+import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
+import com.pacho.appregisoc.data.dto.PhysicalTrainerUpdateRequest
+import com.pacho.appregisoc.domain.repository.PhysicalTrainerRepository
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import io.ktor.http.parameters
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+class PhysicalTrainerApiService(
+    private val client: HttpClient,
+    private val apiBaseUrl: String = "http://localhost:8080/api"
+) : PhysicalTrainerRepository {
+
+    private val baseUrl = apiBaseUrl.replace("/players", "/physical-trainers")
+    private val trainersFlow = MutableStateFlow<List<PhysicalTrainerResponse>>(emptyList())
+
+    override fun getPhysicalTrainers(): Flow<List<PhysicalTrainerResponse>> = trainersFlow.asStateFlow()
+
+    override suspend fun getById(id: Long): Result<PhysicalTrainerResponse?> {
+        return try {
+            val response = client.get {
+                url("$baseUrl/$id")
+            }
+            if (!response.status.isSuccess()) {
+                return Result.Error("Error al obtener preparador físico: ${response.status}")
+            }
+            Result.Success(response.body<PhysicalTrainerResponse>())
+        } catch (e: Exception) {
+            Result.Error("Error al obtener preparador físico: ${e.message}", e)
+        }
+    }
+
+    override suspend fun getByClub(clubId: Long): Result<List<PhysicalTrainerResponse>> {
+        return try {
+            val response = client.get {
+                url(baseUrl) {
+                    parameters.append("clubId", clubId.toString())
+                }
+            }
+            if (!response.status.isSuccess()) {
+                return Result.Error("Error al obtener preparadores físicos: ${response.status}")
+            }
+            val trainers = response.body<List<PhysicalTrainerResponse>>()
+            trainersFlow.value = trainers
+            Result.Success(trainers)
+        } catch (e: Exception) {
+            Result.Error("Error al obtener preparadores físicos: ${e.message}", e)
+        }
+    }
+
+    override suspend fun createPhysicalTrainer(trainer: PhysicalTrainerResponse): Result<PhysicalTrainerResponse> {
+        return try {
+            val response = client.post {
+                url(baseUrl)
+                contentType(ContentType.Application.Json)
+                setBody(
+                    PhysicalTrainerRequest(
+                        clubId = trainer.clubId,
+                        firstName = trainer.firstName,
+                        lastName = trainer.lastName,
+                        documentNumber = trainer.documentNumber,
+                        age = trainer.age,
+                        dateOfBirth = trainer.dateOfBirth,
+                        photoUrl = trainer.photoUrl
+                    )
+                )
+            }
+            if (!response.status.isSuccess()) {
+                return Result.Error("Error al crear preparador físico: ${response.status}")
+            }
+            val created = response.body<PhysicalTrainerResponse>()
+            trainersFlow.value = trainersFlow.value + created
+            Result.Success(created)
+        } catch (e: Exception) {
+            Result.Error("Error al crear preparador físico: ${e.message}", e)
+        }
+    }
+
+    override suspend fun updatePhysicalTrainer(id: Long, entity: PhysicalTrainerResponse): Result<Unit> {
+        return try {
+            val response = client.put {
+                url("$baseUrl/$id")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    PhysicalTrainerUpdateRequest(
+                        firstName = entity.firstName,
+                        lastName = entity.lastName,
+                        documentNumber = entity.documentNumber,
+                        age = entity.age,
+                        dateOfBirth = entity.dateOfBirth,
+                        photoUrl = entity.photoUrl
+                    )
+                )
+            }
+            if (!response.status.isSuccess()) {
+                return Result.Error("Error al actualizar preparador físico: ${response.status}")
+            }
+            trainersFlow.value = trainersFlow.value.map {
+                if (it.id == id) entity else it
+            }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error("Error al actualizar preparador físico: ${e.message}", e)
+        }
+    }
+
+    override suspend fun deletePhysicalTrainer(id: Long): Result<Unit> {
+        return try {
+            val response = client.delete {
+                url("$baseUrl/$id")
+            }
+            if (!response.status.isSuccess()) {
+                return Result.Error("Error al eliminar preparador físico: ${response.status}")
+            }
+            trainersFlow.value = trainersFlow.value.filter { it.id != id }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error("Error al eliminar preparador físico: ${e.message}", e)
+        }
+    }
+}
