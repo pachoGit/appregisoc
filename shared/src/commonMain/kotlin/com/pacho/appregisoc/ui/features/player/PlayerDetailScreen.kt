@@ -129,23 +129,6 @@ private fun PhotoAttachedPlaceholder(url: String) {
                 .height(150.dp)
                 .clip(RoundedCornerShape(12.dp))
         )
-
-        /*
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                "Foto adjunta",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-        */
     }
 }
 

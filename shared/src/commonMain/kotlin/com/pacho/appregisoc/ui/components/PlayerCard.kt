@@ -6,14 +6,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.pacho.appregisoc.data.dto.PlayerResponse
 
@@ -110,24 +114,58 @@ fun PlayerCard(
                 }
                 DropdownMenu(
                     expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
+                    onDismissRequest = { showMenu = false },
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shadowElevation = 8.dp,
+                    tonalElevation = 0.dp,
+                    offset = DpOffset(8.dp, 8.dp)
                 ) {
                     DropdownMenuItem(
                         text = { Text("Ver detalle") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
                         onClick = {
                             showMenu = false
                             onView()
                         }
                     )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
                     DropdownMenuItem(
                         text = { Text("Editar") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
                         onClick = {
                             showMenu = false
                             onEdit()
                         }
                     )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
                     DropdownMenuItem(
                         text = { Text("Eliminar", color = MaterialTheme.colorScheme.error) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        },
                         onClick = {
                             showMenu = false
                             showDeleteDialog = true

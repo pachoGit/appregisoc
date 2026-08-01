@@ -185,6 +185,40 @@ fun App() {
                         }
                     }
 
+                    is Screen.PlayerCreate -> {
+                        PlayerCreateScreen(
+                            onSave = { formState ->
+                                playerViewModel.savePlayer(formState)
+                                currentScreen = Screen.Staff
+                            },
+                            onCancel = { currentScreen = Screen.Staff },
+                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                                playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                            }
+                        )
+                    }
+
+                    is Screen.PlayerEdit -> {
+                        PlayerEditScreen(
+                            player = screen.player,
+                            onSave = { formState ->
+                                playerViewModel.savePlayer(formState)
+                                currentScreen = Screen.Staff
+                            },
+                            onCancel = { currentScreen = Screen.Staff },
+                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                                playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                            }
+                        )
+                    }
+
+                    is Screen.PlayerDetail -> {
+                        PlayerDetailScreen(
+                            player = screen.player,
+                            onBack = { currentScreen = Screen.Staff }
+                        )
+                    }
+
                     is Screen.CoachCreate -> {
                         CoachCreateScreen(
                             onSave = { formState ->

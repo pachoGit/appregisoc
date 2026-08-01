@@ -41,7 +41,6 @@ class PlayerApiService(
 
     override suspend fun getByClub(clubId: Long): Result<List<PlayerResponse>> {
         return try {
-            println("SOLICITUD HACIA: " + baseUrl)
             val response = client.get {
                 url(baseUrl)
                 parameter("clubId", clubId)
