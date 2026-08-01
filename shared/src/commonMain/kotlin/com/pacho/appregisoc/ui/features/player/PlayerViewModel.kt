@@ -34,18 +34,13 @@ class PlayerViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    init {
-        loadPlayers()
-    }
-
-    private fun loadPlayers() {
+    fun loadPlayers(clubId: Long = 1L) {
         viewModelScope.launch {
-            getPlayersUseCase()
-                .onStart { _uiState.value = PlayerUiState.Loading }
-                .catch { e -> _uiState.value = PlayerUiState.Error(e.message ?: "Error desconocido") }
-                .collect { list ->
-                    _uiState.value = PlayerUiState.Success(list)
-                }
+            _uiState.value = PlayerUiState.Loading
+            when (val result = getPlayersUseCase(clubId)) {
+                is Result.Error -> _uiState.value = PlayerUiState.Error(result.message)
+                is Result.Success -> _uiState.value = PlayerUiState.Success(result.data)
+            }
         }
     }
 

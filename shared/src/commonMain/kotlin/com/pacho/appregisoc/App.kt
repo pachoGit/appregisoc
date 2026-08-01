@@ -160,6 +160,9 @@ fun App() {
                             onTabSelected = ::onTabSelected,
                             snackbarHost = { SnackbarHost(snackbarHostState) }
                         ) {
+                            LaunchedEffect(Unit) {
+                                playerViewModel.loadPlayers()
+                            }
                             StaffScreen(
                                 selectedTab = selectedStaffTab,
                                 onTabSelected = { selectedStaffTab = it },
@@ -181,53 +184,7 @@ fun App() {
                             )
                         }
                     }
-                    is Screen.PlayerList -> {
-                        MainLayout(
-                            title = "Jugadores",
-                            selectedTab = 2,
-                            onTabSelected = ::onTabSelected,
-                            snackbarHost = { SnackbarHost(snackbarHostState) }
-                        ) {
-                            PlayerListScreen(
-                                uiState = playerUiState,
-                                onAddPlayer = { currentScreen = Screen.PlayerCreate },
-                                onEditPlayer = { currentScreen = Screen.PlayerEdit(it) },
-                                onDeletePlayer = { playerViewModel.deletePlayer(it) },
-                                onViewPlayer = { currentScreen = Screen.PlayerDetail(it) }
-                            )
-                        }
-                    }
-                    is Screen.PlayerCreate -> {
-                        PlayerCreateScreen(
-                            onSave = { formState ->
-                                playerViewModel.savePlayer(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.PlayerEdit -> {
-                        PlayerEditScreen(
-                            player = screen.player,
-                            onSave = { formState ->
-                                playerViewModel.savePlayer(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.PlayerDetail -> {
-                        PlayerDetailScreen(
-                            player = screen.player,
-                            onBack = { currentScreen = Screen.Staff }
-                        )
-                    }
+
                     is Screen.CoachCreate -> {
                         CoachCreateScreen(
                             onSave = { formState ->
@@ -277,6 +234,10 @@ fun App() {
                             entity = screen.trainer,
                             onBack = { currentScreen = Screen.Staff }
                         )
+                    }
+
+                    else -> {
+
                     }
                 }
             }

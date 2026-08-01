@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -16,7 +17,6 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import io.ktor.http.parameters
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,11 +25,6 @@ class PlayerApiService(
     private val client: HttpClient,
     private val baseUrl: String = "http://localhost:8080/api/players"
 ) : PlayerRepository {
-
-    private val playersFlow = MutableStateFlow<List<PlayerResponse>>(emptyList())
-
-    override fun getPlayers(): Flow<List<PlayerResponse>> = playersFlow.asStateFlow()
-
     override suspend fun getById(id: Long): Result<PlayerResponse?> {
         return try {
             val response = client.get {
@@ -46,16 +41,15 @@ class PlayerApiService(
 
     override suspend fun getByClub(clubId: Long): Result<List<PlayerResponse>> {
         return try {
+            println("SOLICITUD HACIA: " + baseUrl)
             val response = client.get {
-                url(baseUrl) {
-                    parameters.append("clubId", clubId.toString())
-                }
+                url(baseUrl)
+                parameter("clubId", clubId)
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al obtener jugadores: ${response.status}")
             }
             val players = response.body<List<PlayerResponse>>()
-            playersFlow.value = players
             Result.Success(players)
         } catch (e: Exception) {
             Result.Error("Error al obtener jugadores: ${e.message}", e)
@@ -86,7 +80,6 @@ class PlayerApiService(
                 return Result.Error("Error al crear jugador: ${response.status}")
             }
             val created = response.body<PlayerResponse>()
-            playersFlow.value = playersFlow.value + created
             Result.Success(created)
         } catch (e: Exception) {
             Result.Error("Error al crear jugador: ${e.message}", e)
@@ -115,9 +108,6 @@ class PlayerApiService(
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al actualizar jugador: ${response.status}")
             }
-            playersFlow.value = playersFlow.value.map {
-                if (it.id == id) player else it
-            }
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error("Error al actualizar jugador: ${e.message}", e)
@@ -132,7 +122,6 @@ class PlayerApiService(
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al eliminar jugador: ${response.status}")
             }
-            playersFlow.value = playersFlow.value.filter { it.id != id }
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error("Error al eliminar jugador: ${e.message}", e)

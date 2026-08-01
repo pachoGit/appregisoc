@@ -9,6 +9,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
@@ -16,7 +17,6 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import io.ktor.http.parameters
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,9 +48,8 @@ class PhysicalTrainerApiService(
     override suspend fun getByClub(clubId: Long): Result<List<PhysicalTrainerResponse>> {
         return try {
             val response = client.get {
-                url(baseUrl) {
-                    parameters.append("clubId", clubId.toString())
-                }
+                url(baseUrl)
+                parameter("clubId", clubId)
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al obtener preparadores físicos: ${response.status}")

@@ -1,5 +1,6 @@
 package com.pacho.appregisoc.ui.features.player
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.pacho.appregisoc.data.dto.PlayerResponse
 import com.pacho.appregisoc.ui.components.DniPhotoPlaceholder
 import com.pacho.appregisoc.ui.components.InfoRow
@@ -119,6 +121,16 @@ private fun PhotoAttachedPlaceholder(url: String) {
             .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
         contentAlignment = Alignment.Center
     ) {
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .clip(RoundedCornerShape(12.dp))
+        )
+
+        /*
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,
@@ -133,6 +145,7 @@ private fun PhotoAttachedPlaceholder(url: String) {
                 color = MaterialTheme.colorScheme.primary
             )
         }
+        */
     }
 }
 
@@ -161,8 +174,8 @@ private fun PlayerDetailScreenWithPhotosPreview() {
         PlayerDetailScreen(
             player = previewPlayer.copy(
                 photoUrl = "https://example.com/photo.jpg",
-                documentFrontUrl = "https://example.com/dni-front.jpg",
-                documentBackUrl = "https://example.com/dni-back.jpg"
+                documentFrontUrl = "https://ciudadania.pe/actividades-interactivas/static/media/ordenar8.155d0398e5f8867aac02.png",
+                documentBackUrl = "https://ciudadania.pe/actividades-interactivas/static/media/ordenar8.155d0398e5f8867aac02.png"
             ),
             onBack = {}
         )
