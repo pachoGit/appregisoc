@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,7 +17,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
+import com.pacho.appregisoc.ui.components.DniPhotoPlaceholder
 import com.pacho.appregisoc.ui.components.InfoRow
 import com.pacho.appregisoc.ui.components.InfoSection
 
@@ -81,8 +84,49 @@ fun PhysicalTrainerDetailScreen(
                 InfoRow(label = "Fecha de Nacimiento", value = entity.dateOfBirth.ifBlank { "No registrada" })
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            InfoSection(title = "Documentación") {
+                Text("DNI Frontal", style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (entity.documentFrontUrl != null) {
+                    PhotoAttachedPlaceholder(url = entity.documentFrontUrl)
+                } else {
+                    DniPhotoPlaceholder()
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("DNI Posterior", style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (entity.documentBackUrl != null) {
+                    PhotoAttachedPlaceholder(url = entity.documentBackUrl)
+                } else {
+                    DniPhotoPlaceholder()
+                }
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+@Composable
+private fun PhotoAttachedPlaceholder(url: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .clip(RoundedCornerShape(12.dp))
+        )
     }
 }
 
@@ -99,6 +143,21 @@ private fun PhysicalTrainerDetailScreenPreview() {
     MaterialTheme {
         PhysicalTrainerDetailScreen(
             entity = previewTrainer,
+            onBack = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PhysicalTrainerDetailScreenWithPhotosPreview() {
+    MaterialTheme {
+        PhysicalTrainerDetailScreen(
+            entity = previewTrainer.copy(
+                photoUrl = "https://example.com/photo.jpg",
+                documentFrontUrl = "https://ciudadania.pe/actividades-interactivas/static/media/ordenar8.155d0398e5f8867aac02.png",
+                documentBackUrl = "https://ciudadania.pe/actividades-interactivas/static/media/ordenar8.155d0398e5f8867aac02.png"
+            ),
             onBack = {}
         )
     }

@@ -12,6 +12,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import com.pacho.appregisoc.domain.model.PhysicalTrainerValidator
 import com.pacho.appregisoc.ui.components.FormScaffold
+import com.pacho.appregisoc.ui.components.PhotoPickerState
+import com.pacho.appregisoc.ui.components.rememberImagePickerLauncher
 import com.pacho.appregisoc.ui.features.player.toDateString
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -19,13 +21,23 @@ import com.pacho.appregisoc.ui.features.player.toDateString
 fun PhysicalTrainerEditScreen(
     entity: PhysicalTrainerResponse,
     onSave: (PhysicalTrainerFormState) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onUploadPhoto: (ByteArray, String, PhotoType, (PhotoPickerState) -> Unit) -> Unit = { _, _, _, _ -> }
 ) {
     var formState by remember { mutableStateOf(PhysicalTrainerFormState.fromPhysicalTrainer(entity)) }
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = formState.dateOfBirth.takeIf { it.isNotBlank() }?.let { null }
     )
+    var activePhotoType by remember { mutableStateOf<PhotoType?>(null) }
+
+    val imagePickerLauncher = rememberImagePickerLauncher { result ->
+        val type = activePhotoType ?: return@rememberImagePickerLauncher
+        activePhotoType = null
+        handleImagePickerResult(result, type, onUploadPhoto) { newState ->
+            formState = updateFormPhotoState(formState, type, newState)
+        }
+    }
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -56,6 +68,10 @@ fun PhysicalTrainerEditScreen(
         PhysicalTrainerFormBody(
             formState = formState,
             onValueChange = { formState = it },
+            onPickImage = {
+                activePhotoType = it
+                imagePickerLauncher()
+            },
             onShowDatePicker = { showDatePicker = true },
             modifier = Modifier
                 .fillMaxSize()

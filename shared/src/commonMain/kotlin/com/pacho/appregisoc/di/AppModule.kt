@@ -37,7 +37,8 @@ class AppModule {
     private val coachApiBaseUrl = apiBaseUrl.replace("/players", "/coaches")
     private val coachRepository: CoachRepository = CoachApiService(httpClient, coachApiBaseUrl)
 
-    private val physicalTrainerRepository: PhysicalTrainerRepository = PhysicalTrainerApiService(httpClient, apiBaseUrl)
+    private val physicalTrainerApiBaseUrl = apiBaseUrl.replace("/players", "/physical-trainers")
+    private val physicalTrainerRepository: PhysicalTrainerRepository = PhysicalTrainerApiService(httpClient, physicalTrainerApiBaseUrl)
 
     private val photoUploadDataSource: PhotoUploadDataSource = MockPhotoUploadDataSource()
 

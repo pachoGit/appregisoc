@@ -13,6 +13,8 @@ data class PhysicalTrainerResponse(
     val age: Int,
     @SerialName("dateOfBirth") val dateOfBirth: String,
     @SerialName("photoUrl") val photoUrl: String? = null,
+    @SerialName("documentFrontUrl") val documentFrontUrl: String? = null,
+    @SerialName("documentBackUrl") val documentBackUrl: String? = null,
     @SerialName("createdAt") val createdAt: String? = null,
     @SerialName("updatedAt") val updatedAt: String? = null
 )

@@ -17,20 +17,11 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class PhysicalTrainerApiService(
     private val client: HttpClient,
-    private val apiBaseUrl: String = "http://localhost:8080/api"
+    private val baseUrl: String = "http://localhost:8080/api/physical-trainers"
 ) : PhysicalTrainerRepository {
-
-    private val baseUrl = apiBaseUrl.replace("/players", "/physical-trainers")
-    private val trainersFlow = MutableStateFlow<List<PhysicalTrainerResponse>>(emptyList())
-
-    override fun getPhysicalTrainers(): Flow<List<PhysicalTrainerResponse>> = trainersFlow.asStateFlow()
-
     override suspend fun getById(id: Long): Result<PhysicalTrainerResponse?> {
         return try {
             val response = client.get {
@@ -55,7 +46,6 @@ class PhysicalTrainerApiService(
                 return Result.Error("Error al obtener preparadores físicos: ${response.status}")
             }
             val trainers = response.body<List<PhysicalTrainerResponse>>()
-            trainersFlow.value = trainers
             Result.Success(trainers)
         } catch (e: Exception) {
             Result.Error("Error al obtener preparadores físicos: ${e.message}", e)
@@ -75,7 +65,9 @@ class PhysicalTrainerApiService(
                         documentNumber = trainer.documentNumber,
                         age = trainer.age,
                         dateOfBirth = trainer.dateOfBirth,
-                        photoUrl = trainer.photoUrl
+                        photoUrl = trainer.photoUrl,
+                        documentFrontUrl = trainer.documentFrontUrl,
+                        documentBackUrl = trainer.documentBackUrl
                     )
                 )
             }
@@ -83,7 +75,6 @@ class PhysicalTrainerApiService(
                 return Result.Error("Error al crear preparador físico: ${response.status}")
             }
             val created = response.body<PhysicalTrainerResponse>()
-            trainersFlow.value = trainersFlow.value + created
             Result.Success(created)
         } catch (e: Exception) {
             Result.Error("Error al crear preparador físico: ${e.message}", e)
@@ -102,15 +93,14 @@ class PhysicalTrainerApiService(
                         documentNumber = entity.documentNumber,
                         age = entity.age,
                         dateOfBirth = entity.dateOfBirth,
-                        photoUrl = entity.photoUrl
+                        photoUrl = entity.photoUrl,
+                        documentFrontUrl = entity.documentFrontUrl,
+                        documentBackUrl = entity.documentBackUrl
                     )
                 )
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al actualizar preparador físico: ${response.status}")
-            }
-            trainersFlow.value = trainersFlow.value.map {
-                if (it.id == id) entity else it
             }
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -126,7 +116,6 @@ class PhysicalTrainerApiService(
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al eliminar preparador físico: ${response.status}")
             }
-            trainersFlow.value = trainersFlow.value.filter { it.id != id }
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error("Error al eliminar preparador físico: ${e.message}", e)

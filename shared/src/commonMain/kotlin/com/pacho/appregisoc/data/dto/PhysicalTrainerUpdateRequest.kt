@@ -10,5 +10,7 @@ data class PhysicalTrainerUpdateRequest(
     @SerialName("documentNumber") val documentNumber: String,
     val age: Int,
     @SerialName("dateOfBirth") val dateOfBirth: String,
-    @SerialName("photoUrl") val photoUrl: String? = null
+    @SerialName("photoUrl") val photoUrl: String? = null,
+    @SerialName("documentFrontUrl") val documentFrontUrl: String? = null,
+    @SerialName("documentBackUrl") val documentBackUrl: String? = null
 )

@@ -7,6 +7,8 @@ import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import com.pacho.appregisoc.domain.usecase.DeletePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.GetPhysicalTrainersUseCase
 import com.pacho.appregisoc.domain.usecase.SavePhysicalTrainerUseCase
+import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
+import com.pacho.appregisoc.ui.components.PhotoPickerState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -19,7 +21,8 @@ sealed class PhysicalTrainerUiState {
 class PhysicalTrainerViewModel(
     private val getPhysicalTrainersUseCase: GetPhysicalTrainersUseCase,
     private val savePhysicalTrainerUseCase: SavePhysicalTrainerUseCase,
-    private val deletePhysicalTrainerUseCase: DeletePhysicalTrainerUseCase
+    private val deletePhysicalTrainerUseCase: DeletePhysicalTrainerUseCase,
+    private val uploadPhotoUseCase: UploadPhotoUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PhysicalTrainerUiState>(PhysicalTrainerUiState.Loading)
@@ -31,21 +34,15 @@ class PhysicalTrainerViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    init {
-        loadPhysicalTrainers()
-    }
-
-    private fun loadPhysicalTrainers() {
+    fun loadPhysicalTrainers(clubId: Long = 1L) {
         viewModelScope.launch {
-            getPhysicalTrainersUseCase()
-                .onStart { _uiState.value = PhysicalTrainerUiState.Loading }
-                .catch { e -> _uiState.value = PhysicalTrainerUiState.Error(e.message ?: "Error desconocido") }
-                .collect { list ->
-                    _uiState.value = PhysicalTrainerUiState.Success(list)
-                }
+            _uiState.value = PhysicalTrainerUiState.Loading
+            when(val result = getPhysicalTrainersUseCase(clubId)) {
+                is Result.Error -> _uiState.value = PhysicalTrainerUiState.Error(result.message)
+                is Result.Success -> _uiState.value = PhysicalTrainerUiState.Success(result.data)
+            }
         }
     }
-
     fun savePhysicalTrainer(formState: PhysicalTrainerFormState) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -58,7 +55,9 @@ class PhysicalTrainerViewModel(
                     age = formState.age,
                     dateOfBirth = formState.dateOfBirth,
                     clubId = formState.clubId,
-                    photoUrl = formState.photoUrl.ifBlank { null }
+                    photoUrl = formState.photoUrl.ifBlank { null },
+                    documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
+                    documentBackUrl = formState.documentBackUrl.ifBlank { null }
                 )
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
@@ -72,7 +71,6 @@ class PhysicalTrainerViewModel(
             }
         }
     }
-
     fun deletePhysicalTrainer(id: Long) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -84,6 +82,28 @@ class PhysicalTrainerViewModel(
                 }
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+    fun uploadPhoto(
+        imageBytes: ByteArray,
+        fileName: String,
+        photoType: PhotoType,
+        onStateUpdate: (PhotoPickerState) -> Unit
+    ) {
+        viewModelScope.launch {
+            onStateUpdate(PhotoPickerState(isUploading = true))
+
+            val result = uploadPhotoUseCase(imageBytes, fileName)
+            when (result) {
+                is Result.Error -> {
+                    onStateUpdate(PhotoPickerState(error = result.message))
+                    _snackBarMessage.emit(result.message)
+                }
+                is Result.Success -> {
+                    onStateUpdate(PhotoPickerState(remoteUrl = result.data))
+                    _snackBarMessage.emit("Foto subida correctamente")
+                }
             }
         }
     }

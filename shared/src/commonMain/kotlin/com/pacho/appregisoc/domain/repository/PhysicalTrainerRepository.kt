@@ -5,7 +5,6 @@ import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import kotlinx.coroutines.flow.Flow
 
 interface PhysicalTrainerRepository {
-    fun getPhysicalTrainers(): Flow<List<PhysicalTrainerResponse>>
     suspend fun getById(id: Long): Result<PhysicalTrainerResponse?>
     suspend fun getByClub(clubId: Long): Result<List<PhysicalTrainerResponse>>
     suspend fun createPhysicalTrainer(trainer: PhysicalTrainerResponse): Result<PhysicalTrainerResponse>

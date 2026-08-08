@@ -17,7 +17,9 @@ class SavePhysicalTrainerUseCase(
         age: String,
         dateOfBirth: String,
         clubId: Long = 1L,
-        photoUrl: String? = null
+        photoUrl: String? = null,
+        documentFrontUrl: String? = null,
+        documentBackUrl: String? = null
     ): Result<Unit> {
         val validation = PhysicalTrainerValidator.validate(firstName, lastName, documentNumber, age, dateOfBirth)
         if (!validation.isValid) {
@@ -32,7 +34,9 @@ class SavePhysicalTrainerUseCase(
             documentNumber = documentNumber.trim(),
             age = age.toInt(),
             dateOfBirth = dateOfBirth,
-            photoUrl = photoUrl?.ifBlank { null }
+            photoUrl = photoUrl?.ifBlank { null },
+            documentFrontUrl = documentFrontUrl?.ifBlank { null },
+            documentBackUrl = documentBackUrl?.ifBlank { null }
         )
 
         return if (id != null) {

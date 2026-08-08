@@ -11,17 +11,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pacho.appregisoc.domain.model.CoachValidator
 import com.pacho.appregisoc.ui.components.FormScaffold
+import com.pacho.appregisoc.ui.components.PhotoPickerState
+import com.pacho.appregisoc.ui.components.rememberImagePickerLauncher
 import com.pacho.appregisoc.ui.features.player.toDateString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachCreateScreen(
     onSave: (CoachFormState) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onUploadPhoto: (ByteArray, String, PhotoType, (PhotoPickerState) -> Unit) -> Unit = { _, _, _, _ -> }
 ) {
     var formState by remember { mutableStateOf(CoachFormState()) }
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    var activePhotoType by remember { mutableStateOf<PhotoType?>(null) }
+
+    val imagePickerLauncher = rememberImagePickerLauncher { result ->
+        val type = activePhotoType ?: return@rememberImagePickerLauncher
+        activePhotoType = null
+        handleImagePickerResult(result, type, onUploadPhoto) { newState ->
+            formState = updateFormPhotoState(formState, type, newState)
+        }
+    }
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -52,6 +64,10 @@ fun CoachCreateScreen(
         CoachFormBody(
             formState = formState,
             onValueChange = { formState = it },
+            onPickImage = {
+                activePhotoType = it
+                imagePickerLauncher()
+            },
             onShowDatePicker = { showDatePicker = true },
             modifier = Modifier
                 .fillMaxSize()

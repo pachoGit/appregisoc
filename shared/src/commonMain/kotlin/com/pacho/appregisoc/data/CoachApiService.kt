@@ -26,10 +26,6 @@ class CoachApiService(
     private val baseUrl: String = "http://localhost:8080/api/coaches"
 ) : CoachRepository {
 
-    private val coachesFlow = MutableStateFlow<List<CoachResponse>>(emptyList())
-
-    override fun getCoaches(): Flow<List<CoachResponse>> = coachesFlow.asStateFlow()
-
     override suspend fun getById(id: Long): Result<CoachResponse?> {
         return try {
             val response = client.get {
@@ -54,7 +50,6 @@ class CoachApiService(
                 return Result.Error("Error al obtener entrenadores: ${response.status}")
             }
             val coaches = response.body<List<CoachResponse>>()
-            coachesFlow.value = coaches
             Result.Success(coaches)
         } catch (e: Exception) {
             Result.Error("Error al obtener entrenadores: ${e.message}", e)
@@ -74,7 +69,9 @@ class CoachApiService(
                         documentNumber = coach.documentNumber,
                         age = coach.age,
                         dateOfBirth = coach.dateOfBirth,
-                        photoUrl = coach.photoUrl
+                        photoUrl = coach.photoUrl,
+                        documentFrontUrl = coach.documentFrontUrl,
+                        documentBackUrl = coach.documentBackUrl
                     )
                 )
             }
@@ -82,7 +79,6 @@ class CoachApiService(
                 return Result.Error("Error al crear entrenador: ${response.status}")
             }
             val created = response.body<CoachResponse>()
-            coachesFlow.value = coachesFlow.value + created
             Result.Success(created)
         } catch (e: Exception) {
             Result.Error("Error al crear entrenador: ${e.message}", e)
@@ -101,15 +97,14 @@ class CoachApiService(
                         documentNumber = coach.documentNumber,
                         age = coach.age,
                         dateOfBirth = coach.dateOfBirth,
-                        photoUrl = coach.photoUrl
+                        photoUrl = coach.photoUrl,
+                        documentFrontUrl = coach.documentFrontUrl,
+                        documentBackUrl = coach.documentBackUrl
                     )
                 )
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al actualizar entrenador: ${response.status}")
-            }
-            coachesFlow.value = coachesFlow.value.map {
-                if (it.id == id) coach else it
             }
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -125,7 +120,6 @@ class CoachApiService(
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al eliminar entrenador: ${response.status}")
             }
-            coachesFlow.value = coachesFlow.value.filter { it.id != id }
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error("Error al eliminar entrenador: ${e.message}", e)

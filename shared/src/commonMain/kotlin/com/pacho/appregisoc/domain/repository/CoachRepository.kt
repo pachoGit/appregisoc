@@ -5,7 +5,6 @@ import com.pacho.appregisoc.data.dto.CoachResponse
 import kotlinx.coroutines.flow.Flow
 
 interface CoachRepository {
-    fun getCoaches(): Flow<List<CoachResponse>>
     suspend fun getById(id: Long): Result<CoachResponse?>
     suspend fun getByClub(clubId: Long): Result<List<CoachResponse>>
     suspend fun createCoach(coach: CoachResponse): Result<CoachResponse>

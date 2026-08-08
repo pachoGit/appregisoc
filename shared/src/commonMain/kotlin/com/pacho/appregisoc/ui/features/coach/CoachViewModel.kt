@@ -7,6 +7,8 @@ import com.pacho.appregisoc.data.dto.CoachResponse
 import com.pacho.appregisoc.domain.usecase.DeleteCoachUseCase
 import com.pacho.appregisoc.domain.usecase.GetCoachesUseCase
 import com.pacho.appregisoc.domain.usecase.SaveCoachUseCase
+import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
+import com.pacho.appregisoc.ui.components.PhotoPickerState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -19,7 +21,8 @@ sealed class CoachUiState {
 class CoachViewModel(
     private val getCoachesUseCase: GetCoachesUseCase,
     private val saveCoachUseCase: SaveCoachUseCase,
-    private val deleteCoachUseCase: DeleteCoachUseCase
+    private val deleteCoachUseCase: DeleteCoachUseCase,
+    private val uploadPhotoUseCase: UploadPhotoUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CoachUiState>(CoachUiState.Loading)
@@ -31,18 +34,13 @@ class CoachViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    init {
-        loadCoaches()
-    }
-
-    private fun loadCoaches() {
+    fun loadCoaches(clubId: Long = 1L) {
         viewModelScope.launch {
-            getCoachesUseCase()
-                .onStart { _uiState.value = CoachUiState.Loading }
-                .catch { e -> _uiState.value = CoachUiState.Error(e.message ?: "Error desconocido") }
-                .collect { list ->
-                    _uiState.value = CoachUiState.Success(list)
-                }
+            _uiState.value = CoachUiState.Loading
+            when (val result = getCoachesUseCase(clubId)) {
+                is Result.Error -> _uiState.value = CoachUiState.Error(result.message)
+                is Result.Success -> _uiState.value = CoachUiState.Success(result.data)
+            }
         }
     }
 
@@ -58,7 +56,9 @@ class CoachViewModel(
                     age = formState.age,
                     dateOfBirth = formState.dateOfBirth,
                     clubId = formState.clubId,
-                    photoUrl = formState.photoUrl.ifBlank { null }
+                    photoUrl = formState.photoUrl.ifBlank { null },
+                    documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
+                    documentBackUrl = formState.documentBackUrl.ifBlank { null }
                 )
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
@@ -84,6 +84,29 @@ class CoachViewModel(
                 }
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    fun uploadPhoto(
+        imageBytes: ByteArray,
+        fileName: String,
+        photoType: PhotoType,
+        onStateUpdate: (PhotoPickerState) -> Unit
+    ) {
+        viewModelScope.launch {
+            onStateUpdate(PhotoPickerState(isUploading = true))
+
+            val result = uploadPhotoUseCase(imageBytes, fileName)
+            when (result) {
+                is Result.Error -> {
+                    onStateUpdate(PhotoPickerState(error = result.message))
+                    _snackBarMessage.emit(result.message)
+                }
+                is Result.Success -> {
+                    onStateUpdate(PhotoPickerState(remoteUrl = result.data))
+                    _snackBarMessage.emit("Foto subida correctamente")
+                }
             }
         }
     }

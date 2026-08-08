@@ -7,11 +7,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.pacho.appregisoc.ui.components.PhotoPickerField
 
 @Composable
 fun PhysicalTrainerFormBody(
     formState: PhysicalTrainerFormState,
     onValueChange: (PhysicalTrainerFormState) -> Unit,
+    onPickImage: (PhotoType) -> Unit,
     onShowDatePicker: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -114,5 +116,30 @@ fun PhysicalTrainerFormBody(
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            "Fotos del Preparador Físico",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        PhotoPickerField(
+            label = "Foto del Preparador",
+            state = formState.photoState,
+            onPickImage = { onPickImage(PhotoType.TRAINER) }
+        )
+
+        PhotoPickerField(
+            label = "DNI Frontal",
+            state = formState.dniFrontPhotoState,
+            onPickImage = { onPickImage(PhotoType.DNI_FRONT) }
+        )
+
+        PhotoPickerField(
+            label = "DNI Posterior",
+            state = formState.dniBackPhotoState,
+            onPickImage = { onPickImage(PhotoType.DNI_BACK) }
+        )
     }
 }

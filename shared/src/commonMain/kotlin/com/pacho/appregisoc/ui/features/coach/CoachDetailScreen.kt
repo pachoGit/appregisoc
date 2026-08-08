@@ -18,7 +18,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.pacho.appregisoc.data.dto.CoachResponse
+import com.pacho.appregisoc.ui.components.DniPhotoPlaceholder
 import com.pacho.appregisoc.ui.components.InfoRow
 import com.pacho.appregisoc.ui.components.InfoSection
 
@@ -85,11 +87,21 @@ fun CoachDetailScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            InfoSection(title = "Foto") {
-                if (coach.photoUrl != null) {
-                    PhotoAttachedPlaceholder(url = coach.photoUrl)
+            InfoSection(title = "Documentación") {
+                Text("DNI Frontal", style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (coach.documentFrontUrl != null) {
+                    PhotoAttachedPlaceholder(url = coach.documentFrontUrl)
                 } else {
-                    Text("Sin foto", style = MaterialTheme.typography.bodySmall)
+                    DniPhotoPlaceholder()
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("DNI Posterior", style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (coach.documentBackUrl != null) {
+                    PhotoAttachedPlaceholder(url = coach.documentBackUrl)
+                } else {
+                    DniPhotoPlaceholder()
                 }
             }
 
@@ -108,20 +120,14 @@ private fun PhotoAttachedPlaceholder(url: String) {
             .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                "Foto adjunta",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .clip(RoundedCornerShape(12.dp))
+        )
     }
 }
 
@@ -145,10 +151,14 @@ private fun CoachDetailScreenPreview() {
 
 @Preview
 @Composable
-private fun CoachDetailScreenWithPhotoPreview() {
+private fun CoachDetailScreenWithPhotosPreview() {
     MaterialTheme {
         CoachDetailScreen(
-            coach = previewCoach.copy(photoUrl = "https://example.com/photo.jpg"),
+            coach = previewCoach.copy(
+                photoUrl = "https://example.com/photo.jpg",
+                documentFrontUrl = "https://ciudadania.pe/actividades-interactivas/static/media/ordenar8.155d0398e5f8867aac02.png",
+                documentBackUrl = "https://ciudadania.pe/actividades-interactivas/static/media/ordenar8.155d0398e5f8867aac02.png"
+            ),
             onBack = {}
         )
     }

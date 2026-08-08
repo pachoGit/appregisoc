@@ -43,14 +43,16 @@ fun App() {
         CoachViewModel(
             getCoachesUseCase = appModule.getCoachesUseCase,
             saveCoachUseCase = appModule.saveCoachUseCase,
-            deleteCoachUseCase = appModule.deleteCoachUseCase
+            deleteCoachUseCase = appModule.deleteCoachUseCase,
+            uploadPhotoUseCase = appModule.uploadPhotoUseCase
         )
     }
     val physicalTrainerViewModel: PhysicalTrainerViewModel = viewModel {
         PhysicalTrainerViewModel(
             getPhysicalTrainersUseCase = appModule.getPhysicalTrainersUseCase,
             savePhysicalTrainerUseCase = appModule.savePhysicalTrainerUseCase,
-            deletePhysicalTrainerUseCase = appModule.deletePhysicalTrainerUseCase
+            deletePhysicalTrainerUseCase = appModule.deletePhysicalTrainerUseCase,
+            uploadPhotoUseCase = appModule.uploadPhotoUseCase
         )
     }
 
@@ -162,6 +164,8 @@ fun App() {
                         ) {
                             LaunchedEffect(Unit) {
                                 playerViewModel.loadPlayers()
+                                coachViewModel.loadCoaches()
+                                physicalTrainerViewModel.loadPhysicalTrainers()
                             }
                             StaffScreen(
                                 selectedTab = selectedStaffTab,
@@ -225,7 +229,10 @@ fun App() {
                                 coachViewModel.saveCoach(formState)
                                 currentScreen = Screen.Staff
                             },
-                            onCancel = { currentScreen = Screen.Staff }
+                            onCancel = { currentScreen = Screen.Staff },
+                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                                coachViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                            }
                         )
                     }
                     is Screen.CoachEdit -> {
@@ -235,7 +242,10 @@ fun App() {
                                 coachViewModel.saveCoach(formState)
                                 currentScreen = Screen.Staff
                             },
-                            onCancel = { currentScreen = Screen.Staff }
+                            onCancel = { currentScreen = Screen.Staff },
+                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                                coachViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                            }
                         )
                     }
                     is Screen.CoachDetail -> {
@@ -250,7 +260,10 @@ fun App() {
                                 physicalTrainerViewModel.savePhysicalTrainer(formState)
                                 currentScreen = Screen.Staff
                             },
-                            onCancel = { currentScreen = Screen.Staff }
+                            onCancel = { currentScreen = Screen.Staff },
+                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                                physicalTrainerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                            }
                         )
                     }
                     is Screen.PhysicalTrainerEdit -> {
@@ -260,7 +273,10 @@ fun App() {
                                 physicalTrainerViewModel.savePhysicalTrainer(formState)
                                 currentScreen = Screen.Staff
                             },
-                            onCancel = { currentScreen = Screen.Staff }
+                            onCancel = { currentScreen = Screen.Staff },
+                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
+                                physicalTrainerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
+                            }
                         )
                     }
                     is Screen.PhysicalTrainerDetail -> {
