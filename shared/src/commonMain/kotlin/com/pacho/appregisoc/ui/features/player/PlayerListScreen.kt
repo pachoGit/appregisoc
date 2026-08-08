@@ -17,11 +17,16 @@ import com.pacho.appregisoc.ui.components.PlayerCard
 @Composable
 fun PlayerListScreen(
     uiState: PlayerUiState,
+    onLoad: () -> Unit,
     onAddPlayer: () -> Unit,
     onEditPlayer: (PlayerResponse) -> Unit,
     onDeletePlayer: (Long) -> Unit,
     onViewPlayer: (PlayerResponse) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onLoad()
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -63,7 +68,7 @@ fun PlayerListScreen(
                         )
                     } else {
                         LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
+                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(players, key = { it.id }) { player ->
@@ -93,6 +98,7 @@ private fun PlayerListScreenSuccessPreview() {
     MaterialTheme {
         PlayerListScreen(
             uiState = PlayerUiState.Success(mockPlayers),
+            onLoad = {},
             onAddPlayer = {},
             onEditPlayer = {},
             onDeletePlayer = {},
@@ -107,6 +113,7 @@ private fun PlayerListScreenEmptyPreview() {
     MaterialTheme {
         PlayerListScreen(
             uiState = PlayerUiState.Success(emptyList()),
+            onLoad = {},
             onAddPlayer = {},
             onEditPlayer = {},
             onDeletePlayer = {},
@@ -121,6 +128,7 @@ private fun PlayerListScreenErrorPreview() {
     MaterialTheme {
         PlayerListScreen(
             uiState = PlayerUiState.Error("Error al cargar jugadores"),
+            onLoad = {},
             onAddPlayer = {},
             onEditPlayer = {},
             onDeletePlayer = {},
@@ -135,6 +143,7 @@ private fun PlayerListScreenLoadingPreview() {
     MaterialTheme {
         PlayerListScreen(
             uiState = PlayerUiState.Loading,
+            onLoad = {},
             onAddPlayer = {},
             onEditPlayer = {},
             onDeletePlayer = {},

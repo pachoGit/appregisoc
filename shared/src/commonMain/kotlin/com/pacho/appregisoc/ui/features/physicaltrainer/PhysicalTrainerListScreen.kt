@@ -9,8 +9,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,17 +21,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 
 @Composable
 fun PhysicalTrainerListScreen(
     uiState: PhysicalTrainerUiState,
+    onLoad: () -> Unit,
     onAdd: () -> Unit,
     onEdit: (PhysicalTrainerResponse) -> Unit,
     onDelete: (Long) -> Unit,
     onView: (PhysicalTrainerResponse) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onLoad()
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -70,7 +79,7 @@ fun PhysicalTrainerListScreen(
                         )
                     } else {
                         LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
+                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(trainers, key = { it.id }) { trainer ->
@@ -182,24 +191,58 @@ private fun PhysicalTrainerCard(
                 }
                 DropdownMenu(
                     expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
+                    onDismissRequest = { showMenu = false },
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shadowElevation = 8.dp,
+                    tonalElevation = 0.dp,
+                    offset = DpOffset(8.dp, 8.dp)
                 ) {
                     DropdownMenuItem(
                         text = { Text("Ver detalle") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Visibility,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
                         onClick = {
                             showMenu = false
                             onView()
                         }
                     )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
                     DropdownMenuItem(
                         text = { Text("Editar") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        },
                         onClick = {
                             showMenu = false
                             onEdit()
                         }
                     )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                    )
                     DropdownMenuItem(
                         text = { Text("Eliminar", color = MaterialTheme.colorScheme.error) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        },
                         onClick = {
                             showMenu = false
                             showDeleteDialog = true
@@ -222,6 +265,7 @@ private fun PhysicalTrainerListScreenSuccessPreview() {
     MaterialTheme {
         PhysicalTrainerListScreen(
             uiState = PhysicalTrainerUiState.Success(mockTrainers),
+            onLoad = {},
             onAdd = {},
             onEdit = {},
             onDelete = {},
@@ -236,6 +280,7 @@ private fun PhysicalTrainerListScreenEmptyPreview() {
     MaterialTheme {
         PhysicalTrainerListScreen(
             uiState = PhysicalTrainerUiState.Success(emptyList()),
+            onLoad = {},
             onAdd = {},
             onEdit = {},
             onDelete = {},
@@ -250,6 +295,7 @@ private fun PhysicalTrainerListScreenErrorPreview() {
     MaterialTheme {
         PhysicalTrainerListScreen(
             uiState = PhysicalTrainerUiState.Error("Error al cargar preparadores físicos"),
+            onLoad = {},
             onAdd = {},
             onEdit = {},
             onDelete = {},
@@ -264,6 +310,7 @@ private fun PhysicalTrainerListScreenLoadingPreview() {
     MaterialTheme {
         PhysicalTrainerListScreen(
             uiState = PhysicalTrainerUiState.Loading,
+            onLoad = {},
             onAdd = {},
             onEdit = {},
             onDelete = {},

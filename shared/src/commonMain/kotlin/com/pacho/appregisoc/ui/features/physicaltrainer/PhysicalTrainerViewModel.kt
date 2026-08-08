@@ -61,10 +61,13 @@ class PhysicalTrainerViewModel(
                 )
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> _snackBarMessage.emit(
-                        if (formState.isEditing) "Preparador físico actualizado correctamente"
-                        else "Preparador físico registrado correctamente"
-                    )
+                    is Result.Success -> {
+                        _snackBarMessage.emit(
+                            if (formState.isEditing) "Preparador físico actualizado correctamente"
+                            else "Preparador físico registrado correctamente"
+                        )
+                        loadPhysicalTrainers(formState.clubId)
+                    }
                 }
             } finally {
                 _isLoading.value = false
@@ -78,7 +81,10 @@ class PhysicalTrainerViewModel(
                 val result = deletePhysicalTrainerUseCase(id)
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> _snackBarMessage.emit("Preparador físico eliminado")
+                    is Result.Success -> {
+                        _snackBarMessage.emit("Preparador físico eliminado")
+                        loadPhysicalTrainers()
+                    }
                 }
             } finally {
                 _isLoading.value = false

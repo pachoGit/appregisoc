@@ -162,17 +162,15 @@ fun App() {
                             onTabSelected = ::onTabSelected,
                             snackbarHost = { SnackbarHost(snackbarHostState) }
                         ) {
-                            LaunchedEffect(Unit) {
-                                playerViewModel.loadPlayers()
-                                coachViewModel.loadCoaches()
-                                physicalTrainerViewModel.loadPhysicalTrainers()
-                            }
                             StaffScreen(
                                 selectedTab = selectedStaffTab,
                                 onTabSelected = { selectedStaffTab = it },
                                 playerUiState = playerUiState,
                                 coachUiState = coachUiState,
                                 physicalTrainerUiState = physicalTrainerUiState,
+                                onLoadPlayers = { playerViewModel.loadPlayers() },
+                                onLoadCoaches = { coachViewModel.loadCoaches() },
+                                onLoadTrainers = { physicalTrainerViewModel.loadPhysicalTrainers() },
                                 onAddPlayer = { currentScreen = Screen.PlayerCreate },
                                 onEditPlayer = { currentScreen = Screen.PlayerEdit(it) },
                                 onDeletePlayer = { playerViewModel.deletePlayer(it) },

@@ -25,6 +25,9 @@ fun StaffScreen(
     playerUiState: PlayerUiState,
     coachUiState: CoachUiState,
     physicalTrainerUiState: PhysicalTrainerUiState,
+    onLoadPlayers: () -> Unit,
+    onLoadCoaches: () -> Unit,
+    onLoadTrainers: () -> Unit,
     onAddPlayer: () -> Unit,
     onEditPlayer: (PlayerResponse) -> Unit,
     onDeletePlayer: (Long) -> Unit,
@@ -80,6 +83,7 @@ fun StaffScreen(
             0 -> {
                 PlayerListScreen(
                     uiState = playerUiState,
+                    onLoad = onLoadPlayers,
                     onAddPlayer = onAddPlayer,
                     onEditPlayer = onEditPlayer,
                     onDeletePlayer = onDeletePlayer,
@@ -89,6 +93,7 @@ fun StaffScreen(
             1 -> {
                 CoachListScreen(
                     uiState = coachUiState,
+                    onLoad = onLoadCoaches,
                     onAddCoach = onAddCoach,
                     onEditCoach = onEditCoach,
                     onDeleteCoach = onDeleteCoach,
@@ -98,6 +103,7 @@ fun StaffScreen(
             2 -> {
                 PhysicalTrainerListScreen(
                     uiState = physicalTrainerUiState,
+                    onLoad = onLoadTrainers,
                     onAdd = onAddTrainer,
                     onEdit = onEditTrainer,
                     onDelete = onDeleteTrainer,

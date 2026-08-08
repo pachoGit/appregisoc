@@ -63,10 +63,13 @@ class PlayerViewModel(
                 )
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> _snackBarMessage.emit(
-                        if (formState.isEditing) "Jugador actualizado correctamente"
-                        else "Jugador registrado correctamente"
-                    )
+                    is Result.Success -> {
+                        _snackBarMessage.emit(
+                            if (formState.isEditing) "Jugador actualizado correctamente"
+                            else "Jugador registrado correctamente"
+                        )
+                        loadPlayers(formState.clubId)
+                    }
                 }
             } finally {
                 _isLoading.value = false
@@ -81,7 +84,10 @@ class PlayerViewModel(
                 val result = deletePlayerUseCase(id)
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> _snackBarMessage.emit("Jugador eliminado")
+                    is Result.Success -> {
+                        _snackBarMessage.emit("Jugador eliminado")
+                        loadPlayers()
+                    }
                 }
             } finally {
                 _isLoading.value = false

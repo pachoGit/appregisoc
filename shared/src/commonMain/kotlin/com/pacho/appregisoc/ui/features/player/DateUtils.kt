@@ -11,7 +11,7 @@ fun Long.toDateString(): String {
         val day = localDateTime.day.toString().padStart(2, '0')
         val month = localDateTime.month.number.toString().padStart(2, '0')
         val year = localDateTime.year
-        "$year-$day-$month"
+        "$year-$month-$day"
     } catch (e: Exception) {
         ""
     }

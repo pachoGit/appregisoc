@@ -62,10 +62,13 @@ class CoachViewModel(
                 )
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> _snackBarMessage.emit(
-                        if (formState.isEditing) "Entrenador actualizado correctamente"
-                        else "Entrenador registrado correctamente"
-                    )
+                    is Result.Success -> {
+                        _snackBarMessage.emit(
+                            if (formState.isEditing) "Entrenador actualizado correctamente"
+                            else "Entrenador registrado correctamente"
+                        )
+                        loadCoaches(formState.clubId)
+                    }
                 }
             } finally {
                 _isLoading.value = false
@@ -80,7 +83,10 @@ class CoachViewModel(
                 val result = deleteCoachUseCase(id)
                 when (result) {
                     is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> _snackBarMessage.emit("Entrenador eliminado")
+                    is Result.Success -> {
+                        _snackBarMessage.emit("Entrenador eliminado")
+                        loadCoaches()
+                    }
                 }
             } finally {
                 _isLoading.value = false
