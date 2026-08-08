@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class CoachApiService(
     private val client: HttpClient,
-    private val baseUrl: String = "http://localhost:8080/api/coaches"
+    private val baseUrl: String
 ) : CoachRepository {
 
     override suspend fun getById(id: Long): Result<CoachResponse?> {

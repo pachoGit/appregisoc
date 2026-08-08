@@ -29,16 +29,13 @@ import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
 
 class AppModule {
     private val httpClient = createHttpClient()
-    private val playerRepository: PlayerRepository = PlayerApiService(httpClient, apiBaseUrl)
+    private val playerRepository: PlayerRepository = PlayerApiService(httpClient, "$apiBaseUrl/players")
 
-    private val clubApiBaseUrl = apiBaseUrl.replace("/players", "/clubs")
-    private val clubRepository: ClubRepository = ClubApiService(httpClient, clubApiBaseUrl)
+    private val clubRepository: ClubRepository = ClubApiService(httpClient, "$apiBaseUrl/clubs")
 
-    private val coachApiBaseUrl = apiBaseUrl.replace("/players", "/coaches")
-    private val coachRepository: CoachRepository = CoachApiService(httpClient, coachApiBaseUrl)
+    private val coachRepository: CoachRepository = CoachApiService(httpClient, "$apiBaseUrl/coaches")
 
-    private val physicalTrainerApiBaseUrl = apiBaseUrl.replace("/players", "/physical-trainers")
-    private val physicalTrainerRepository: PhysicalTrainerRepository = PhysicalTrainerApiService(httpClient, physicalTrainerApiBaseUrl)
+    private val physicalTrainerRepository: PhysicalTrainerRepository = PhysicalTrainerApiService(httpClient, "$apiBaseUrl/physical-trainers")
 
     private val photoUploadDataSource: PhotoUploadDataSource = MockPhotoUploadDataSource()
 

@@ -20,7 +20,7 @@ import io.ktor.http.isSuccess
 
 class PhysicalTrainerApiService(
     private val client: HttpClient,
-    private val baseUrl: String = "http://localhost:8080/api/physical-trainers"
+    private val baseUrl: String
 ) : PhysicalTrainerRepository {
     override suspend fun getById(id: Long): Result<PhysicalTrainerResponse?> {
         return try {

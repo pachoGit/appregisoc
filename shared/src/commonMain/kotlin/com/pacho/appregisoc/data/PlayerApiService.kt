@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class PlayerApiService(
     private val client: HttpClient,
-    private val baseUrl: String = "http://localhost:8080/api/players"
+    private val baseUrl: String
 ) : PlayerRepository {
     override suspend fun getById(id: Long): Result<PlayerResponse?> {
         return try {

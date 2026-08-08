@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class ClubApiService(
     private val client: HttpClient,
-    private val baseUrl: String = "http://localhost:8080/api/clubs"
+    private val baseUrl: String
 ) : ClubRepository {
 
     private val clubsFlow = MutableStateFlow<List<ClubResponse>>(emptyList())
