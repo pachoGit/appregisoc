@@ -31,6 +31,7 @@ fun MainLayout(
     selectedTab: Int = 0,
     onTabSelected: (Int) -> Unit = {},
     snackbarHost: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -55,6 +56,7 @@ fun MainLayout(
                     }
                 },
                 actions = {
+                    actions()
                     IconButton(
                         onClick = onLogoClick,
                         modifier = Modifier

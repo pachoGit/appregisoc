@@ -2,6 +2,7 @@ package com.pacho.appregisoc.ui.navigation
 
 import com.pacho.appregisoc.data.dto.ClubResponse
 import com.pacho.appregisoc.data.dto.CoachResponse
+import com.pacho.appregisoc.data.dto.EventResponse
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import com.pacho.appregisoc.data.dto.PlayerResponse
 
@@ -11,6 +12,11 @@ sealed class Screen {
     data object ClubCreate : Screen()
     data class ClubEdit(val club: ClubResponse) : Screen()
     data class ClubDetail(val club: ClubResponse) : Screen()
+
+    data object EventList : Screen()
+    data object EventCreate : Screen()
+    data class EventEdit(val event: EventResponse) : Screen()
+    data class EventDetail(val event: EventResponse) : Screen()
 
     data object Staff : Screen()
     data object PlayerList : Screen()

@@ -10,6 +10,7 @@ import com.pacho.appregisoc.di.AppModule
 import com.pacho.appregisoc.ui.components.LoadingOverlay
 import com.pacho.appregisoc.ui.features.club.*
 import com.pacho.appregisoc.ui.features.coach.*
+import com.pacho.appregisoc.ui.features.event.*
 import com.pacho.appregisoc.ui.features.home.HomeScreen
 import com.pacho.appregisoc.ui.features.physicaltrainer.*
 import com.pacho.appregisoc.ui.features.player.*
@@ -55,16 +56,26 @@ fun App() {
             uploadPhotoUseCase = appModule.uploadPhotoUseCase
         )
     }
+    val eventViewModel: EventViewModel = viewModel {
+        EventViewModel(
+            getEventsUseCase = appModule.getEventsUseCase,
+            createEventUseCase = appModule.createEventUseCase,
+            updateEventUseCase = appModule.updateEventUseCase,
+            deleteEventUseCase = appModule.deleteEventUseCase
+        )
+    }
 
     val playerUiState by playerViewModel.uiState.collectAsState()
     val clubUiState by clubViewModel.uiState.collectAsState()
     val coachUiState by coachViewModel.uiState.collectAsState()
     val physicalTrainerUiState by physicalTrainerViewModel.uiState.collectAsState()
+    val eventUiState by eventViewModel.uiState.collectAsState()
 
     val playerIsLoading by playerViewModel.isLoading.collectAsState()
     val clubIsLoading by clubViewModel.isLoading.collectAsState()
     val coachIsLoading by coachViewModel.isLoading.collectAsState()
     val physicalTrainerIsLoading by physicalTrainerViewModel.isLoading.collectAsState()
+    val eventIsLoading by eventViewModel.isLoading.collectAsState()
 
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
     var selectedStaffTab by remember { mutableStateOf(0) }
@@ -75,7 +86,8 @@ fun App() {
             playerViewModel.snackBarMessage,
             clubViewModel.snackBarMessage,
             coachViewModel.snackBarMessage,
-            physicalTrainerViewModel.snackBarMessage
+            physicalTrainerViewModel.snackBarMessage,
+            eventViewModel.snackBarMessage
         ).collect { message ->
             snackbarHostState.showSnackbar(message)
         }
@@ -84,14 +96,14 @@ fun App() {
     fun onTabSelected(tab: Int) {
         currentScreen = when (tab) {
             0 -> Screen.Home
-            1 -> Screen.ClubList
+            1 -> Screen.EventList
             2 -> Screen.Staff
             else -> Screen.Home
         }
     }
 
     MaterialTheme {
-        val isLoading = playerIsLoading || clubIsLoading || coachIsLoading || physicalTrainerIsLoading
+        val isLoading = playerIsLoading || clubIsLoading || coachIsLoading || physicalTrainerIsLoading || eventIsLoading
         LoadingOverlay(isLoading = isLoading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 when (val screen = currentScreen) {
@@ -153,6 +165,51 @@ fun App() {
                         ClubDetailScreen(
                             club = screen.club,
                             onBack = { currentScreen = Screen.ClubList }
+                        )
+                    }
+                    is Screen.EventList -> {
+                        MainLayout(
+                            title = "Eventos",
+                            selectedTab = 1,
+                            onTabSelected = ::onTabSelected,
+                            snackbarHost = { SnackbarHost(snackbarHostState) }
+                        ) {
+                            EventListScreen(
+                                uiState = eventUiState,
+                                onLoad = { eventViewModel.loadEvents() },
+                                onAddEvent = { currentScreen = Screen.EventCreate },
+                                onEditEvent = { currentScreen = Screen.EventEdit(it) },
+                                onDeleteEvent = { eventViewModel.deleteEvent(it) },
+                                onViewEvent = { currentScreen = Screen.EventDetail(it) }
+                            )
+                        }
+                    }
+                    is Screen.EventCreate -> {
+                        EventCreateScreen(
+                            onSave = { formState ->
+                                eventViewModel.createEvent(formState)
+                                currentScreen = Screen.EventList
+                            },
+                            onBack = { currentScreen = Screen.EventList },
+                            onTabSelected = ::onTabSelected
+                        )
+                    }
+                    is Screen.EventEdit -> {
+                        EventEditScreen(
+                            event = screen.event,
+                            onSave = { formState ->
+                                eventViewModel.updateEvent(formState)
+                                currentScreen = Screen.EventList
+                            },
+                            onBack = { currentScreen = Screen.EventList },
+                            onTabSelected = ::onTabSelected
+                        )
+                    }
+                    is Screen.EventDetail -> {
+                        EventDetailScreen(
+                            event = screen.event,
+                            onBack = { currentScreen = Screen.EventList },
+                            onTabSelected = ::onTabSelected
                         )
                     }
                     is Screen.Staff -> {

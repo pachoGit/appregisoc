@@ -2,6 +2,7 @@ package com.pacho.appregisoc.di
 
 import com.pacho.appregisoc.data.CoachApiService
 import com.pacho.appregisoc.data.ClubApiService
+import com.pacho.appregisoc.data.EventApiService
 import com.pacho.appregisoc.data.MockPhotoUploadDataSource
 import com.pacho.appregisoc.data.PhotoUploadDataSource
 import com.pacho.appregisoc.data.PhysicalTrainerApiService
@@ -10,21 +11,26 @@ import com.pacho.appregisoc.data.apiBaseUrl
 import com.pacho.appregisoc.data.createHttpClient
 import com.pacho.appregisoc.domain.repository.CoachRepository
 import com.pacho.appregisoc.domain.repository.ClubRepository
+import com.pacho.appregisoc.domain.repository.EventRepository
 import com.pacho.appregisoc.domain.repository.PhysicalTrainerRepository
 import com.pacho.appregisoc.domain.repository.PlayerRepository
 import com.pacho.appregisoc.domain.usecase.CreateClubUseCase
+import com.pacho.appregisoc.domain.usecase.CreateEventUseCase
 import com.pacho.appregisoc.domain.usecase.DeleteClubUseCase
 import com.pacho.appregisoc.domain.usecase.DeleteCoachUseCase
+import com.pacho.appregisoc.domain.usecase.DeleteEventUseCase
 import com.pacho.appregisoc.domain.usecase.DeletePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.DeletePlayerUseCase
 import com.pacho.appregisoc.domain.usecase.GetClubsUseCase
 import com.pacho.appregisoc.domain.usecase.GetCoachesUseCase
+import com.pacho.appregisoc.domain.usecase.GetEventsUseCase
 import com.pacho.appregisoc.domain.usecase.GetPhysicalTrainersUseCase
 import com.pacho.appregisoc.domain.usecase.GetPlayersUseCase
 import com.pacho.appregisoc.domain.usecase.SaveCoachUseCase
 import com.pacho.appregisoc.domain.usecase.SavePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.SavePlayerUseCase
 import com.pacho.appregisoc.domain.usecase.UpdateClubUseCase
+import com.pacho.appregisoc.domain.usecase.UpdateEventUseCase
 import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
 
 class AppModule {
@@ -36,6 +42,8 @@ class AppModule {
     private val coachRepository: CoachRepository = CoachApiService(httpClient, "$apiBaseUrl/coaches")
 
     private val physicalTrainerRepository: PhysicalTrainerRepository = PhysicalTrainerApiService(httpClient, "$apiBaseUrl/physical-trainers")
+
+    private val eventRepository: EventRepository = EventApiService(httpClient, "$apiBaseUrl/events")
 
     private val photoUploadDataSource: PhotoUploadDataSource = MockPhotoUploadDataSource()
 
@@ -56,4 +64,9 @@ class AppModule {
     val createClubUseCase = CreateClubUseCase(clubRepository)
     val updateClubUseCase = UpdateClubUseCase(clubRepository)
     val deleteClubUseCase = DeleteClubUseCase(clubRepository)
+
+    val getEventsUseCase = GetEventsUseCase(eventRepository)
+    val createEventUseCase = CreateEventUseCase(eventRepository)
+    val updateEventUseCase = UpdateEventUseCase(eventRepository)
+    val deleteEventUseCase = DeleteEventUseCase(eventRepository)
 }
