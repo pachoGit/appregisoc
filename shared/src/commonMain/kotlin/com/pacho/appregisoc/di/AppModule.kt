@@ -3,6 +3,7 @@ package com.pacho.appregisoc.di
 import com.pacho.appregisoc.data.CoachApiService
 import com.pacho.appregisoc.data.ClubApiService
 import com.pacho.appregisoc.data.EventApiService
+import com.pacho.appregisoc.data.MockMatchDateRepository
 import com.pacho.appregisoc.data.MockPhotoUploadDataSource
 import com.pacho.appregisoc.data.PhotoUploadDataSource
 import com.pacho.appregisoc.data.PhysicalTrainerApiService
@@ -12,6 +13,7 @@ import com.pacho.appregisoc.data.createHttpClient
 import com.pacho.appregisoc.domain.repository.CoachRepository
 import com.pacho.appregisoc.domain.repository.ClubRepository
 import com.pacho.appregisoc.domain.repository.EventRepository
+import com.pacho.appregisoc.domain.repository.MatchDateRepository
 import com.pacho.appregisoc.domain.repository.PhysicalTrainerRepository
 import com.pacho.appregisoc.domain.repository.PlayerRepository
 import com.pacho.appregisoc.domain.usecase.CreateClubUseCase
@@ -24,6 +26,7 @@ import com.pacho.appregisoc.domain.usecase.DeletePlayerUseCase
 import com.pacho.appregisoc.domain.usecase.GetClubsUseCase
 import com.pacho.appregisoc.domain.usecase.GetCoachesUseCase
 import com.pacho.appregisoc.domain.usecase.GetEventsUseCase
+import com.pacho.appregisoc.domain.usecase.GetMatchDatesUseCase
 import com.pacho.appregisoc.domain.usecase.GetPhysicalTrainersUseCase
 import com.pacho.appregisoc.domain.usecase.GetPlayersUseCase
 import com.pacho.appregisoc.domain.usecase.SaveCoachUseCase
@@ -44,6 +47,8 @@ class AppModule {
     private val physicalTrainerRepository: PhysicalTrainerRepository = PhysicalTrainerApiService(httpClient, "$apiBaseUrl/physical-trainers")
 
     private val eventRepository: EventRepository = EventApiService(httpClient, "$apiBaseUrl/events")
+
+    private val matchDateRepository: MatchDateRepository = MockMatchDateRepository()
 
     private val photoUploadDataSource: PhotoUploadDataSource = MockPhotoUploadDataSource()
 
@@ -69,4 +74,6 @@ class AppModule {
     val createEventUseCase = CreateEventUseCase(eventRepository)
     val updateEventUseCase = UpdateEventUseCase(eventRepository)
     val deleteEventUseCase = DeleteEventUseCase(eventRepository)
+
+    val getMatchDatesUseCase = GetMatchDatesUseCase(matchDateRepository)
 }

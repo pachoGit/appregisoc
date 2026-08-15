@@ -4,8 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import com.pacho.appregisoc.ui.layouts.MainLayout
 fun EventDetailScreen(
     event: EventResponse,
     onBack: () -> Unit,
+    onViewDates: () -> Unit,
     onTabSelected: (Int) -> Unit
 ) {
     MainLayout(
@@ -97,6 +100,29 @@ fun EventDetailScreen(
                 InfoRow(label = "Actualizado", value = event.updatedAt ?: "-")
             }
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onViewDates,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .height(52.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Ver fechas",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -122,6 +148,7 @@ private fun EventDetailScreenPreview() {
         EventDetailScreen(
             event = previewEvent,
             onBack = {},
+            onViewDates = {},
             onTabSelected = {}
         )
     }

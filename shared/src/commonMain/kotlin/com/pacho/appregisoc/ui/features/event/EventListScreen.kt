@@ -25,9 +25,8 @@ fun EventListScreen(
     uiState: EventUiState,
     onLoad: () -> Unit,
     onAddEvent: () -> Unit,
-    onEditEvent: (EventResponse) -> Unit,
-    onDeleteEvent: (Long) -> Unit,
-    onViewEvent: (EventResponse) -> Unit
+    onViewEvent: (EventResponse) -> Unit,
+    onViewDates: (EventResponse) -> Unit
 ) {
     LaunchedEffect(Unit) {
         onLoad()
@@ -54,9 +53,8 @@ fun EventListScreen(
                 } else {
                     EventsContent(
                         events = events,
-                        onEditEvent = onEditEvent,
-                        onDeleteEvent = onDeleteEvent,
-                        onViewEvent = onViewEvent
+                        onViewEvent = onViewEvent,
+                        onViewDates = onViewDates
                     )
                 }
             }
@@ -67,9 +65,8 @@ fun EventListScreen(
 @Composable
 private fun EventsContent(
     events: List<EventResponse>,
-    onEditEvent: (EventResponse) -> Unit,
-    onDeleteEvent: (Long) -> Unit,
-    onViewEvent: (EventResponse) -> Unit
+    onViewEvent: (EventResponse) -> Unit,
+    onViewDates: (EventResponse) -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp),
@@ -88,9 +85,8 @@ private fun EventsContent(
                 items(group, key = { it.id }) { event ->
                     EventCard(
                         event = event,
-                        onEdit = { onEditEvent(event) },
-                        onDelete = { onDeleteEvent(event.id) },
-                        onView = { onViewEvent(event) }
+                        onView = { onViewEvent(event) },
+                        onViewDates = { onViewDates(event) }
                     )
                 }
             }
@@ -259,8 +255,7 @@ private fun EventListScreenSuccessPreview() {
             uiState = EventUiState.Success(mockEvents),
             onLoad = {},
             onAddEvent = {},
-            onEditEvent = {},
-            onDeleteEvent = {},
+            onViewDates = {},
             onViewEvent = {}
         )
     }
@@ -274,8 +269,7 @@ private fun EventListScreenEmptyPreview() {
             uiState = EventUiState.Success(emptyList()),
             onLoad = {},
             onAddEvent = {},
-            onEditEvent = {},
-            onDeleteEvent = {},
+            onViewDates = {},
             onViewEvent = {}
         )
     }
@@ -289,8 +283,7 @@ private fun EventListScreenErrorPreview() {
             uiState = EventUiState.Error("Error al cargar eventos"),
             onLoad = {},
             onAddEvent = {},
-            onEditEvent = {},
-            onDeleteEvent = {},
+            onViewDates = {},
             onViewEvent = {}
         )
     }
@@ -304,8 +297,7 @@ private fun EventListScreenLoadingPreview() {
             uiState = EventUiState.Loading,
             onLoad = {},
             onAddEvent = {},
-            onEditEvent = {},
-            onDeleteEvent = {},
+            onViewDates = {},
             onViewEvent = {}
         )
     }

@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Visibility
@@ -27,34 +25,11 @@ import com.pacho.appregisoc.data.dto.EventStatus
 @Composable
 fun EventCard(
     event: EventResponse,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
     onView: () -> Unit,
+    onViewDates: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Confirmar eliminación") },
-            text = { Text("¿Estás seguro de eliminar el evento \"${event.name}\"?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    onDelete()
-                    showDeleteDialog = false
-                }) {
-                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
 
     Card(
         modifier = modifier
@@ -134,35 +109,17 @@ fun EventCard(
                                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                             )
                             DropdownMenuItem(
-                                text = { Text("Editar") },
+                                text = { Text("Ver fechas") },
                                 leadingIcon = {
                                     Icon(
-                                        imageVector = Icons.Default.Edit,
+                                        imageVector = Icons.Default.DateRange,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 },
                                 onClick = {
                                     showMenu = false
-                                    onEdit()
-                                }
-                            )
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 12.dp),
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Eliminar", color = MaterialTheme.colorScheme.error) },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                },
-                                onClick = {
-                                    showMenu = false
-                                    showDeleteDialog = true
+                                    onViewDates()
                                 }
                             )
                         }
@@ -226,7 +183,6 @@ private fun EventMeta(
 
 private val previewEvent = EventResponse(
     id = 1,
-    // clubId = 1,
     name = "Torneo Apertura 2026",
     description = "Torneo de fútbol juvenil entre clubes de la región",
     location = "Estadio Central",
@@ -241,9 +197,8 @@ private fun EventCardPreview() {
     MaterialTheme {
         EventCard(
             event = previewEvent,
-            onEdit = {},
-            onDelete = {},
-            onView = {}
+            onView = {},
+            onViewDates = {}
         )
     }
 }

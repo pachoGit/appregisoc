@@ -64,12 +64,18 @@ fun App() {
             deleteEventUseCase = appModule.deleteEventUseCase
         )
     }
+    val matchDateViewModel: MatchDateViewModel = viewModel {
+        MatchDateViewModel(
+            getMatchDatesUseCase = appModule.getMatchDatesUseCase
+        )
+    }
 
     val playerUiState by playerViewModel.uiState.collectAsState()
     val clubUiState by clubViewModel.uiState.collectAsState()
     val coachUiState by coachViewModel.uiState.collectAsState()
     val physicalTrainerUiState by physicalTrainerViewModel.uiState.collectAsState()
     val eventUiState by eventViewModel.uiState.collectAsState()
+    val matchDateUiState by matchDateViewModel.uiState.collectAsState()
 
     val playerIsLoading by playerViewModel.isLoading.collectAsState()
     val clubIsLoading by clubViewModel.isLoading.collectAsState()
@@ -178,9 +184,8 @@ fun App() {
                                 uiState = eventUiState,
                                 onLoad = { eventViewModel.loadEvents() },
                                 onAddEvent = { currentScreen = Screen.EventCreate },
-                                onEditEvent = { currentScreen = Screen.EventEdit(it) },
-                                onDeleteEvent = { eventViewModel.deleteEvent(it) },
-                                onViewEvent = { currentScreen = Screen.EventDetail(it) }
+                                onViewEvent = { currentScreen = Screen.EventDetail(it) },
+                                onViewDates = { currentScreen = Screen.MatchDateList(it) }
                             )
                         }
                     }
@@ -209,6 +214,32 @@ fun App() {
                         EventDetailScreen(
                             event = screen.event,
                             onBack = { currentScreen = Screen.EventList },
+                            onViewDates = { currentScreen = Screen.MatchDateList(screen.event) },
+                            onTabSelected = ::onTabSelected
+                        )
+                    }
+                    is Screen.MatchDateList -> {
+                        MainLayout(
+                            title = "Fechas del Evento",
+                            selectedTab = 1,
+                            onTabSelected = ::onTabSelected,
+                            snackbarHost = { SnackbarHost(snackbarHostState) }
+                        ) {
+                            MatchDateListScreen(
+                                event = screen.event,
+                                uiState = matchDateUiState,
+                                onLoad = { matchDateViewModel.loadMatchDates(screen.event.id) },
+                                onBack = { currentScreen = Screen.EventDetail(screen.event) },
+                                onTabSelected = ::onTabSelected,
+                                onViewDate = { currentScreen = Screen.MatchDateDetail(screen.event, it) },
+                                onRegisterLineup = { onTabSelected(2) }
+                            )
+                        }
+                    }
+                    is Screen.MatchDateDetail -> {
+                        MatchDateDetailScreen(
+                            matchDate = screen.matchDate,
+                            onBack = { currentScreen = Screen.MatchDateList(screen.event) },
                             onTabSelected = ::onTabSelected
                         )
                     }
