@@ -1,22 +1,23 @@
 package com.pacho.appregisoc.ui.features.physicaltrainer
 
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
+import com.pacho.appregisoc.ui.common.PhotoFormState
 import com.pacho.appregisoc.ui.components.PhotoPickerState
 
 data class PhysicalTrainerFormState(
+    override val photoState: PhotoPickerState = PhotoPickerState(),
+    override val dniFrontPhotoState: PhotoPickerState = PhotoPickerState(),
+    override val dniBackPhotoState: PhotoPickerState = PhotoPickerState(),
     val firstName: String = "",
     val lastName: String = "",
     val documentNumber: String = "",
     val age: String = "",
     val dateOfBirth: String = "",
-    val photoState: PhotoPickerState = PhotoPickerState(),
-    val dniFrontPhotoState: PhotoPickerState = PhotoPickerState(),
-    val dniBackPhotoState: PhotoPickerState = PhotoPickerState(),
     val errors: Map<String, String> = emptyMap(),
     val isEditing: Boolean = false,
     val editingId: Long? = null,
     val clubId: Long = 1L
-) {
+) : PhotoFormState {
     val photoUrl: String get() = photoState.remoteUrl ?: ""
     val documentFrontUrl: String get() = dniFrontPhotoState.remoteUrl ?: ""
     val documentBackUrl: String get() = dniBackPhotoState.remoteUrl ?: ""

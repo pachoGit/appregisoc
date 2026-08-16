@@ -3,7 +3,7 @@ package com.pacho.appregisoc
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class SharedCommonTest {
+class SharedLogicJvmTest {
 
     @Test
     fun example() {

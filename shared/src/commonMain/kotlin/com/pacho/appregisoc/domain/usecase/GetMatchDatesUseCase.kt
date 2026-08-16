@@ -9,8 +9,8 @@ import com.pacho.appregisoc.domain.repository.MatchDateRepository
 class GetMatchDatesUseCase(
     private val repository: MatchDateRepository
 ) {
-    suspend operator fun invoke(eventId: Long): Result<List<MatchDateResponse>> {
-        return repository.getByEvent(eventId).map { matchDates ->
+    suspend operator fun invoke(eventId: Long, clubId: Long): Result<List<MatchDateResponse>> {
+        return repository.getByEventAndClub(eventId, clubId).map { matchDates ->
             matchDates.sortedWith(
                 compareBy<MatchDateResponse> { it.status.order }
                     .thenBy { it.date }
@@ -22,7 +22,7 @@ class GetMatchDatesUseCase(
 
 private val MatchDateStatus.order: Int
     get() = when (this) {
-        MatchDateStatus.SCHEDULED -> 0
+        MatchDateStatus.UPCOMING -> 0
         MatchDateStatus.ONGOING -> 1
         MatchDateStatus.FINISHED -> 2
         MatchDateStatus.CANCELLED -> 3

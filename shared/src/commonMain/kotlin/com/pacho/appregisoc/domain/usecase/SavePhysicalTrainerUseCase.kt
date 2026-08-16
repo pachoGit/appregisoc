@@ -3,7 +3,7 @@ package com.pacho.appregisoc.domain.usecase
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.core.map
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
-import com.pacho.appregisoc.domain.model.PhysicalTrainerValidator
+import com.pacho.appregisoc.domain.validation.PhysicalTrainerValidator
 import com.pacho.appregisoc.domain.repository.PhysicalTrainerRepository
 
 class SavePhysicalTrainerUseCase(

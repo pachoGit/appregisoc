@@ -3,7 +3,7 @@ package com.pacho.appregisoc.domain.usecase
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.core.map
 import com.pacho.appregisoc.data.dto.CoachResponse
-import com.pacho.appregisoc.domain.model.CoachValidator
+import com.pacho.appregisoc.domain.validation.CoachValidator
 import com.pacho.appregisoc.domain.repository.CoachRepository
 
 class SaveCoachUseCase(

@@ -1,8 +1,8 @@
-package com.pacho.appregisoc.domain.model
+package com.pacho.appregisoc.domain.validation
 
 import com.pacho.appregisoc.core.ValidationResult
 
-object PhysicalTrainerValidator {
+object CoachValidator {
 
     fun validate(
         firstName: String,
@@ -32,8 +32,8 @@ object PhysicalTrainerValidator {
         }
 
         val ageInt = age.toIntOrNull()
-        if (ageInt == null || ageInt < 0 || ageInt > 120) {
-            errors["age"] = "Ingrese una edad válida (0-120)"
+        if (ageInt == null || ageInt < 1 || ageInt > 120) {
+            errors["age"] = "Ingrese una edad válida (1-120)"
         }
 
         if (dateOfBirth.isBlank()) {

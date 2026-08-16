@@ -3,7 +3,7 @@ package com.pacho.appregisoc.domain.usecase
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.EventUpdateRequest
 import com.pacho.appregisoc.data.dto.EventStatus
-import com.pacho.appregisoc.domain.model.EventValidator
+import com.pacho.appregisoc.domain.validation.EventValidator
 import com.pacho.appregisoc.domain.repository.EventRepository
 
 class UpdateEventUseCase(

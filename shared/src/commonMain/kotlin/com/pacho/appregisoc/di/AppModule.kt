@@ -3,13 +3,13 @@ package com.pacho.appregisoc.di
 import com.pacho.appregisoc.data.CoachApiService
 import com.pacho.appregisoc.data.ClubApiService
 import com.pacho.appregisoc.data.EventApiService
-import com.pacho.appregisoc.data.MockMatchDateRepository
-import com.pacho.appregisoc.data.MockPhotoUploadDataSource
+import com.pacho.appregisoc.data.MatchDateApiService
 import com.pacho.appregisoc.data.PhotoUploadDataSource
 import com.pacho.appregisoc.data.PhysicalTrainerApiService
 import com.pacho.appregisoc.data.PlayerApiService
 import com.pacho.appregisoc.data.apiBaseUrl
 import com.pacho.appregisoc.data.createHttpClient
+import com.pacho.appregisoc.data.mock.MockPhotoUploadDataSource
 import com.pacho.appregisoc.domain.repository.CoachRepository
 import com.pacho.appregisoc.domain.repository.ClubRepository
 import com.pacho.appregisoc.domain.repository.EventRepository
@@ -48,7 +48,7 @@ class AppModule {
 
     private val eventRepository: EventRepository = EventApiService(httpClient, "$apiBaseUrl/events")
 
-    private val matchDateRepository: MatchDateRepository = MockMatchDateRepository()
+    private val matchDateRepository: MatchDateRepository = MatchDateApiService(httpClient, "$apiBaseUrl/match-dates")
 
     private val photoUploadDataSource: PhotoUploadDataSource = MockPhotoUploadDataSource()
 

@@ -1,4 +1,4 @@
-package com.pacho.appregisoc.ui.features.player
+package com.pacho.appregisoc.ui.common
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number

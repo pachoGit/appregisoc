@@ -25,7 +25,7 @@ import com.pacho.appregisoc.data.dto.MatchDateStatus
 
 internal val MatchDateStatus.displayLabel: String
     get() = when (this) {
-        MatchDateStatus.SCHEDULED -> "Programada"
+        MatchDateStatus.UPCOMING -> "Programada"
         MatchDateStatus.ONGOING -> "En curso"
         MatchDateStatus.FINISHED -> "Finalizada"
         MatchDateStatus.CANCELLED -> "Cancelada"
@@ -33,7 +33,7 @@ internal val MatchDateStatus.displayLabel: String
 
 internal val MatchDateStatus.statusColor: Color
     get() = when (this) {
-        MatchDateStatus.SCHEDULED -> Color(0xFF1976D2)
+        MatchDateStatus.UPCOMING -> Color(0xFF1976D2)
         MatchDateStatus.ONGOING -> Color(0xFF2E7D32)
         MatchDateStatus.FINISHED -> Color(0xFF757575)
         MatchDateStatus.CANCELLED -> Color(0xFFC62828)
@@ -41,7 +41,7 @@ internal val MatchDateStatus.statusColor: Color
 
 internal val MatchDateStatus.statusIcon: ImageVector
     get() = when (this) {
-        MatchDateStatus.SCHEDULED -> Icons.Default.Schedule
+        MatchDateStatus.UPCOMING -> Icons.Default.Schedule
         MatchDateStatus.ONGOING -> Icons.Default.PlayArrow
         MatchDateStatus.FINISHED -> Icons.Default.CheckCircle
         MatchDateStatus.CANCELLED -> Icons.Default.Cancel

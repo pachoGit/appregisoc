@@ -8,6 +8,7 @@ import com.pacho.appregisoc.domain.usecase.DeleteCoachUseCase
 import com.pacho.appregisoc.domain.usecase.GetCoachesUseCase
 import com.pacho.appregisoc.domain.usecase.SaveCoachUseCase
 import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
+import com.pacho.appregisoc.ui.common.PhotoType
 import com.pacho.appregisoc.ui.components.PhotoPickerState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

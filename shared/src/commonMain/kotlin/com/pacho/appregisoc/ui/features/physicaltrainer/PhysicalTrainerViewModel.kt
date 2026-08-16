@@ -8,6 +8,7 @@ import com.pacho.appregisoc.domain.usecase.DeletePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.GetPhysicalTrainersUseCase
 import com.pacho.appregisoc.domain.usecase.SavePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
+import com.pacho.appregisoc.ui.common.PhotoType
 import com.pacho.appregisoc.ui.components.PhotoPickerState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

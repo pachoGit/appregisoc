@@ -3,7 +3,7 @@ package com.pacho.appregisoc.domain.usecase
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.ClubResponse
 import com.pacho.appregisoc.data.dto.CreateClubRequest
-import com.pacho.appregisoc.domain.model.ClubValidator
+import com.pacho.appregisoc.domain.validation.ClubValidator
 import com.pacho.appregisoc.domain.repository.ClubRepository
 
 class CreateClubUseCase(

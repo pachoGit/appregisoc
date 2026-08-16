@@ -10,11 +10,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pacho.appregisoc.data.dto.CoachResponse
-import com.pacho.appregisoc.domain.model.CoachValidator
+import com.pacho.appregisoc.domain.validation.CoachValidator
+import com.pacho.appregisoc.ui.common.PhotoType
+import com.pacho.appregisoc.ui.common.handleImagePickerResult
+import com.pacho.appregisoc.ui.common.toDateString
+import com.pacho.appregisoc.ui.common.updateFormPhotoState
 import com.pacho.appregisoc.ui.components.FormScaffold
 import com.pacho.appregisoc.ui.components.PhotoPickerState
 import com.pacho.appregisoc.ui.components.rememberImagePickerLauncher
-import com.pacho.appregisoc.ui.features.player.toDateString
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +38,9 @@ fun CoachEditScreen(
         val type = activePhotoType ?: return@rememberImagePickerLauncher
         activePhotoType = null
         handleImagePickerResult(result, type, onUploadPhoto) { newState ->
-            formState = updateFormPhotoState(formState, type, newState)
+            formState = updateFormPhotoState(formState, type, newState) { photo, front, back ->
+                formState.copy(photoState = photo, dniFrontPhotoState = front, dniBackPhotoState = back)
+            }
         }
     }
 

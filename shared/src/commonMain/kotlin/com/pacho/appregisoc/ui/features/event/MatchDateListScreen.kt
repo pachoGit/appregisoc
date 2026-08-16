@@ -310,7 +310,7 @@ private val previewAwayClub = ClubResponse(
 private val previewMatchDates = listOf(
     MatchDateResponse(
         id = 1, eventId = 1, date = "2026-08-05", startTime = "15:30",
-        location = "Estadio Central", status = MatchDateStatus.SCHEDULED,
+        location = "Estadio Central", status = MatchDateStatus.UPCOMING,
         homeClub = previewHomeClub, awayClub = previewAwayClub
     ),
     MatchDateResponse(

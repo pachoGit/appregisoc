@@ -9,7 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pacho.appregisoc.domain.model.ClubValidator
+import com.pacho.appregisoc.domain.validation.ClubValidator
 import com.pacho.appregisoc.ui.components.FormScaffold
 import com.pacho.appregisoc.ui.components.PhotoPickerState
 import com.pacho.appregisoc.ui.components.rememberImagePickerLauncher

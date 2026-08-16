@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.pacho.appregisoc.data.dto.EventResponse
 import com.pacho.appregisoc.data.dto.EventStatus
-import com.pacho.appregisoc.domain.model.EventValidator
+import com.pacho.appregisoc.domain.validation.EventValidator
 import com.pacho.appregisoc.ui.layouts.MainLayout
 
 @Composable

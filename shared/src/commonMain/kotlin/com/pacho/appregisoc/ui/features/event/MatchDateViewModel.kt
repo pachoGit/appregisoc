@@ -23,10 +23,10 @@ class MatchDateViewModel(
     private val _uiState = MutableStateFlow<MatchDateUiState>(MatchDateUiState.Loading)
     val uiState: StateFlow<MatchDateUiState> = _uiState.asStateFlow()
 
-    fun loadMatchDates(eventId: Long) {
+    fun loadMatchDates(eventId: Long, clubId: Long = 1L) {
         viewModelScope.launch {
             _uiState.value = MatchDateUiState.Loading
-            when (val result = getMatchDatesUseCase(eventId)) {
+            when (val result = getMatchDatesUseCase(eventId, clubId)) {
                 is Result.Error -> _uiState.value = MatchDateUiState.Error(result.message)
                 is Result.Success -> _uiState.value = MatchDateUiState.Success(result.data)
             }

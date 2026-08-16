@@ -1,4 +1,4 @@
-package com.pacho.appregisoc.domain.model
+package com.pacho.appregisoc.domain.validation
 
 import com.pacho.appregisoc.core.ValidationResult
 

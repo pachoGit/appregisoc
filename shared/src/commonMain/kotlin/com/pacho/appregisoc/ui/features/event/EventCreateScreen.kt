@@ -7,7 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.pacho.appregisoc.domain.model.EventValidator
+import com.pacho.appregisoc.domain.validation.EventValidator
 import com.pacho.appregisoc.ui.layouts.MainLayout
 
 @Composable

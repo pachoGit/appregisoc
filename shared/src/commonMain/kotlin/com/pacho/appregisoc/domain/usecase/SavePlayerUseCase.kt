@@ -3,7 +3,7 @@ package com.pacho.appregisoc.domain.usecase
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.core.map
 import com.pacho.appregisoc.data.dto.PlayerResponse
-import com.pacho.appregisoc.domain.model.PlayerValidator
+import com.pacho.appregisoc.domain.validation.PlayerValidator
 import com.pacho.appregisoc.domain.repository.PlayerRepository
 
 class SavePlayerUseCase(

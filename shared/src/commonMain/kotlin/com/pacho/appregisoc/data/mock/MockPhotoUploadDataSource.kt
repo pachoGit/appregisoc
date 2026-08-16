@@ -1,6 +1,7 @@
-package com.pacho.appregisoc.data
+package com.pacho.appregisoc.data.mock
 
 import com.pacho.appregisoc.core.Result
+import com.pacho.appregisoc.data.PhotoUploadDataSource
 import kotlinx.coroutines.delay
 
 class MockPhotoUploadDataSource : PhotoUploadDataSource {

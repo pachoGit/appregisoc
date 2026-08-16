@@ -22,7 +22,6 @@ sealed class Screen {
     data class MatchDateDetail(val event: EventResponse, val matchDate: MatchDateResponse) : Screen()
 
     data object Staff : Screen()
-    data object PlayerList : Screen()
     data object PlayerCreate : Screen()
     data class PlayerEdit(val player: PlayerResponse) : Screen()
     data class PlayerDetail(val player: PlayerResponse) : Screen()
