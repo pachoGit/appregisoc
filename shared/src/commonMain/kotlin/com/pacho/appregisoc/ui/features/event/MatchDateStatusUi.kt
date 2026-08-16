@@ -28,7 +28,7 @@ internal val MatchDateStatus.displayLabel: String
         MatchDateStatus.UPCOMING -> "Programada"
         MatchDateStatus.ONGOING -> "En curso"
         MatchDateStatus.FINISHED -> "Finalizada"
-        MatchDateStatus.CANCELLED -> "Cancelada"
+        MatchDateStatus.CANCELED -> "Cancelada"
     }
 
 internal val MatchDateStatus.statusColor: Color
@@ -36,7 +36,7 @@ internal val MatchDateStatus.statusColor: Color
         MatchDateStatus.UPCOMING -> Color(0xFF1976D2)
         MatchDateStatus.ONGOING -> Color(0xFF2E7D32)
         MatchDateStatus.FINISHED -> Color(0xFF757575)
-        MatchDateStatus.CANCELLED -> Color(0xFFC62828)
+        MatchDateStatus.CANCELED -> Color(0xFFC62828)
     }
 
 internal val MatchDateStatus.statusIcon: ImageVector
@@ -44,7 +44,7 @@ internal val MatchDateStatus.statusIcon: ImageVector
         MatchDateStatus.UPCOMING -> Icons.Default.Schedule
         MatchDateStatus.ONGOING -> Icons.Default.PlayArrow
         MatchDateStatus.FINISHED -> Icons.Default.CheckCircle
-        MatchDateStatus.CANCELLED -> Icons.Default.Cancel
+        MatchDateStatus.CANCELED -> Icons.Default.Cancel
     }
 
 @Composable

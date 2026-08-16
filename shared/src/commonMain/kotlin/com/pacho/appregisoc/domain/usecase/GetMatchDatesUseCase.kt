@@ -25,5 +25,5 @@ private val MatchDateStatus.order: Int
         MatchDateStatus.UPCOMING -> 0
         MatchDateStatus.ONGOING -> 1
         MatchDateStatus.FINISHED -> 2
-        MatchDateStatus.CANCELLED -> 3
+        MatchDateStatus.CANCELED -> 3
     }

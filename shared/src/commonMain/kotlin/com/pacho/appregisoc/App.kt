@@ -2,26 +2,42 @@ package com.pacho.appregisoc
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pacho.appregisoc.di.AppModule
 import com.pacho.appregisoc.ui.components.LoadingOverlay
-import com.pacho.appregisoc.ui.features.club.*
-import com.pacho.appregisoc.ui.features.coach.*
-import com.pacho.appregisoc.ui.features.event.*
-import com.pacho.appregisoc.ui.features.home.HomeScreen
-import com.pacho.appregisoc.ui.features.physicaltrainer.*
-import com.pacho.appregisoc.ui.features.player.*
-import com.pacho.appregisoc.ui.features.staff.StaffScreen
-import com.pacho.appregisoc.ui.layouts.MainLayout
+import com.pacho.appregisoc.ui.features.club.ClubRoute
+import com.pacho.appregisoc.ui.features.club.ClubViewModel
+import com.pacho.appregisoc.ui.features.coach.CoachRoute
+import com.pacho.appregisoc.ui.features.coach.CoachViewModel
+import com.pacho.appregisoc.ui.features.event.EventRoute
+import com.pacho.appregisoc.ui.features.event.EventViewModel
+import com.pacho.appregisoc.ui.features.event.MatchDateViewModel
+import com.pacho.appregisoc.ui.features.home.HomeRoute
+import com.pacho.appregisoc.ui.features.physicaltrainer.PhysicalTrainerRoute
+import com.pacho.appregisoc.ui.features.physicaltrainer.PhysicalTrainerViewModel
+import com.pacho.appregisoc.ui.features.player.PlayerRoute
+import com.pacho.appregisoc.ui.features.player.PlayerViewModel
+import com.pacho.appregisoc.ui.features.staff.StaffRoute
+import com.pacho.appregisoc.ui.navigation.AppNavigator
 import com.pacho.appregisoc.ui.navigation.Screen
 import kotlinx.coroutines.flow.merge
 
 @Composable
 fun App() {
     val appModule = remember { AppModule() }
+    val navigator = remember { AppNavigator() }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val playerViewModel: PlayerViewModel = viewModel {
         PlayerViewModel(
@@ -83,9 +99,7 @@ fun App() {
     val physicalTrainerIsLoading by physicalTrainerViewModel.isLoading.collectAsState()
     val eventIsLoading by eventViewModel.isLoading.collectAsState()
 
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
     var selectedStaffTab by remember { mutableStateOf(0) }
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         merge(
@@ -99,282 +113,60 @@ fun App() {
         }
     }
 
-    fun onTabSelected(tab: Int) {
-        currentScreen = when (tab) {
-            0 -> Screen.Home
-            1 -> Screen.EventList
-            2 -> Screen.Staff
-            else -> Screen.Home
-        }
-    }
-
     MaterialTheme {
         val isLoading = playerIsLoading || clubIsLoading || coachIsLoading || physicalTrainerIsLoading || eventIsLoading
         LoadingOverlay(isLoading = isLoading) {
             Box(modifier = Modifier.fillMaxSize()) {
-                when (val screen = currentScreen) {
-                    is Screen.Home -> {
-                        MainLayout(
-                            title = "Inicio",
-                            selectedTab = 0,
-                            onTabSelected = ::onTabSelected,
-                            snackbarHost = { SnackbarHost(snackbarHostState) }
-                        ) {
-                            HomeScreen(
-                                uiState = clubUiState,
-                                onViewClub = { currentScreen = Screen.ClubDetail(it) }
-                            )
-                        }
-                    }
-                    is Screen.ClubList -> {
-                        MainLayout(
-                            title = "Clubs",
-                            selectedTab = 1,
-                            onTabSelected = ::onTabSelected,
-                            snackbarHost = { SnackbarHost(snackbarHostState) }
-                        ) {
-                            ClubListScreen(
-                                uiState = clubUiState,
-                                onAddClub = { currentScreen = Screen.ClubCreate },
-                                onEditClub = { currentScreen = Screen.ClubEdit(it) },
-                                onDeleteClub = { clubViewModel.deleteClub(it) },
-                                onViewClub = { currentScreen = Screen.ClubDetail(it) }
-                            )
-                        }
-                    }
-                    is Screen.ClubCreate -> {
-                        ClubCreateScreen(
-                            onSave = { formState ->
-                                clubViewModel.createClub(formState)
-                                currentScreen = Screen.ClubList
-                            },
-                            onCancel = { currentScreen = Screen.ClubList },
-                            onUploadPhoto = { bytes, fileName, onStateUpdate ->
-                                clubViewModel.uploadCrestPhoto(bytes, fileName, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.ClubEdit -> {
-                        ClubEditScreen(
-                            club = screen.club,
-                            onSave = { formState ->
-                                clubViewModel.updateClub(formState)
-                                currentScreen = Screen.ClubList
-                            },
-                            onCancel = { currentScreen = Screen.ClubList },
-                            onUploadPhoto = { bytes, fileName, onStateUpdate ->
-                                clubViewModel.uploadCrestPhoto(bytes, fileName, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.ClubDetail -> {
-                        ClubDetailScreen(
-                            club = screen.club,
-                            onBack = { currentScreen = Screen.ClubList }
-                        )
-                    }
-                    is Screen.EventList -> {
-                        MainLayout(
-                            title = "Eventos",
-                            selectedTab = 1,
-                            onTabSelected = ::onTabSelected,
-                            snackbarHost = { SnackbarHost(snackbarHostState) }
-                        ) {
-                            EventListScreen(
-                                uiState = eventUiState,
-                                onLoad = { eventViewModel.loadEvents() },
-                                onAddEvent = { currentScreen = Screen.EventCreate },
-                                onViewEvent = { currentScreen = Screen.EventDetail(it) },
-                                onViewDates = { currentScreen = Screen.MatchDateList(it) }
-                            )
-                        }
-                    }
-                    is Screen.EventCreate -> {
-                        EventCreateScreen(
-                            onSave = { formState ->
-                                eventViewModel.createEvent(formState)
-                                currentScreen = Screen.EventList
-                            },
-                            onBack = { currentScreen = Screen.EventList },
-                            onTabSelected = ::onTabSelected
-                        )
-                    }
-                    is Screen.EventEdit -> {
-                        EventEditScreen(
-                            event = screen.event,
-                            onSave = { formState ->
-                                eventViewModel.updateEvent(formState)
-                                currentScreen = Screen.EventList
-                            },
-                            onBack = { currentScreen = Screen.EventList },
-                            onTabSelected = ::onTabSelected
-                        )
-                    }
-                    is Screen.EventDetail -> {
-                        EventDetailScreen(
-                            event = screen.event,
-                            onBack = { currentScreen = Screen.EventList },
-                            onViewDates = { currentScreen = Screen.MatchDateList(screen.event) },
-                            onTabSelected = ::onTabSelected
-                        )
-                    }
-                    is Screen.MatchDateList -> {
-                        MainLayout(
-                            title = "Fechas del Evento",
-                            selectedTab = 1,
-                            onTabSelected = ::onTabSelected,
-                            snackbarHost = { SnackbarHost(snackbarHostState) }
-                        ) {
-                            MatchDateListScreen(
-                                event = screen.event,
-                                uiState = matchDateUiState,
-                                onLoad = { matchDateViewModel.loadMatchDates(screen.event.id) },
-                                onBack = { currentScreen = Screen.EventDetail(screen.event) },
-                                onTabSelected = ::onTabSelected,
-                                onViewDate = { currentScreen = Screen.MatchDateDetail(screen.event, it) },
-                                onRegisterLineup = { onTabSelected(2) }
-                            )
-                        }
-                    }
-                    is Screen.MatchDateDetail -> {
-                        MatchDateDetailScreen(
-                            matchDate = screen.matchDate,
-                            onBack = { currentScreen = Screen.MatchDateList(screen.event) },
-                            onTabSelected = ::onTabSelected
-                        )
-                    }
-                    is Screen.Staff -> {
-                        MainLayout(
-                            title = "Plantilla",
-                            selectedTab = 2,
-                            onTabSelected = ::onTabSelected,
-                            snackbarHost = { SnackbarHost(snackbarHostState) }
-                        ) {
-                            StaffScreen(
-                                selectedTab = selectedStaffTab,
-                                onTabSelected = { selectedStaffTab = it },
-                                playerUiState = playerUiState,
-                                coachUiState = coachUiState,
-                                physicalTrainerUiState = physicalTrainerUiState,
-                                onLoadPlayers = { playerViewModel.loadPlayers() },
-                                onLoadCoaches = { coachViewModel.loadCoaches() },
-                                onLoadTrainers = { physicalTrainerViewModel.loadPhysicalTrainers() },
-                                onAddPlayer = { currentScreen = Screen.PlayerCreate },
-                                onEditPlayer = { currentScreen = Screen.PlayerEdit(it) },
-                                onDeletePlayer = { playerViewModel.deletePlayer(it) },
-                                onViewPlayer = { currentScreen = Screen.PlayerDetail(it) },
-                                onAddCoach = { currentScreen = Screen.CoachCreate },
-                                onEditCoach = { currentScreen = Screen.CoachEdit(it) },
-                                onDeleteCoach = { coachViewModel.deleteCoach(it) },
-                                onViewCoach = { currentScreen = Screen.CoachDetail(it) },
-                                onAddTrainer = { currentScreen = Screen.PhysicalTrainerCreate },
-                                onEditTrainer = { currentScreen = Screen.PhysicalTrainerEdit(it) },
-                                onDeleteTrainer = { physicalTrainerViewModel.deletePhysicalTrainer(it) },
-                                onViewTrainer = { currentScreen = Screen.PhysicalTrainerDetail(it) }
-                            )
-                        }
-                    }
-
-                    is Screen.PlayerCreate -> {
-                        PlayerCreateScreen(
-                            onSave = { formState ->
-                                playerViewModel.savePlayer(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-
-                    is Screen.PlayerEdit -> {
-                        PlayerEditScreen(
-                            player = screen.player,
-                            onSave = { formState ->
-                                playerViewModel.savePlayer(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                playerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-
-                    is Screen.PlayerDetail -> {
-                        PlayerDetailScreen(
-                            player = screen.player,
-                            onBack = { currentScreen = Screen.Staff }
-                        )
-                    }
-
-                    is Screen.CoachCreate -> {
-                        CoachCreateScreen(
-                            onSave = { formState ->
-                                coachViewModel.saveCoach(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                coachViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.CoachEdit -> {
-                        CoachEditScreen(
-                            coach = screen.coach,
-                            onSave = { formState ->
-                                coachViewModel.saveCoach(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                coachViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.CoachDetail -> {
-                        CoachDetailScreen(
-                            coach = screen.coach,
-                            onBack = { currentScreen = Screen.Staff }
-                        )
-                    }
-                    is Screen.PhysicalTrainerCreate -> {
-                        PhysicalTrainerCreateScreen(
-                            onSave = { formState ->
-                                physicalTrainerViewModel.savePhysicalTrainer(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                physicalTrainerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.PhysicalTrainerEdit -> {
-                        PhysicalTrainerEditScreen(
-                            entity = screen.trainer,
-                            onSave = { formState ->
-                                physicalTrainerViewModel.savePhysicalTrainer(formState)
-                                currentScreen = Screen.Staff
-                            },
-                            onCancel = { currentScreen = Screen.Staff },
-                            onUploadPhoto = { bytes, fileName, photoType, onStateUpdate ->
-                                physicalTrainerViewModel.uploadPhoto(bytes, fileName, photoType, onStateUpdate)
-                            }
-                        )
-                    }
-                    is Screen.PhysicalTrainerDetail -> {
-                        PhysicalTrainerDetailScreen(
-                            entity = screen.trainer,
-                            onBack = { currentScreen = Screen.Staff }
-                        )
-                    }
-
-                    else -> {
-
-                    }
+                val snackbarHost: @Composable () -> Unit = { SnackbarHost(snackbarHostState) }
+                when (val screen = navigator.currentScreen) {
+                    is Screen.Home -> HomeRoute(
+                        uiState = clubUiState,
+                        navigator = navigator,
+                        snackbarHost = snackbarHost
+                    )
+                    is Screen.Club -> ClubRoute(
+                        screen = screen,
+                        uiState = clubUiState,
+                        viewModel = clubViewModel,
+                        navigator = navigator,
+                        snackbarHost = snackbarHost
+                    )
+                    is Screen.Event -> EventRoute(
+                        screen = screen,
+                        uiState = eventUiState,
+                        matchDateUiState = matchDateUiState,
+                        viewModel = eventViewModel,
+                        matchDateViewModel = matchDateViewModel,
+                        navigator = navigator,
+                        snackbarHost = snackbarHost
+                    )
+                    is Screen.Staff -> StaffRoute(
+                        uiState = playerUiState,
+                        coachUiState = coachUiState,
+                        physicalTrainerUiState = physicalTrainerUiState,
+                        viewModel = playerViewModel,
+                        coachViewModel = coachViewModel,
+                        physicalTrainerViewModel = physicalTrainerViewModel,
+                        navigator = navigator,
+                        selectedTab = selectedStaffTab,
+                        onSelectedTabChange = { selectedStaffTab = it },
+                        snackbarHost = snackbarHost
+                    )
+                    is Screen.Player -> PlayerRoute(
+                        screen = screen,
+                        viewModel = playerViewModel,
+                        navigator = navigator
+                    )
+                    is Screen.Coach -> CoachRoute(
+                        screen = screen,
+                        viewModel = coachViewModel,
+                        navigator = navigator
+                    )
+                    is Screen.PhysicalTrainer -> PhysicalTrainerRoute(
+                        screen = screen,
+                        viewModel = physicalTrainerViewModel,
+                        navigator = navigator
+                    )
                 }
             }
         }

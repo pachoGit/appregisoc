@@ -8,22 +8,30 @@ enum class MatchDateStatus {
     @SerialName("UPCOMING") UPCOMING,
     @SerialName("ONGOING") ONGOING,
     @SerialName("FINISHED") FINISHED,
-    @SerialName("CANCELLED") CANCELLED
+    @SerialName("CANCELED") CANCELED
 }
 
 @Serializable
 data class MatchDateResponse(
     val id: Long,
-    @SerialName("eventId") val eventId: Long,
     val date: String,
     @SerialName("startTime") val startTime: String? = null,
     val location: String? = null,
+    val name: String = "",
     val status: MatchDateStatus = MatchDateStatus.UPCOMING,
-    @SerialName("homeClub") val homeClub: ClubResponse? = null,
-    @SerialName("awayClub") val awayClub: ClubResponse? = null,
+    @SerialName("match") val match: MatchResponse? = null,
     @SerialName("createdAt") val createdAt: String? = null,
     @SerialName("updatedAt") val updatedAt: String? = null
 ) {
+    val hasMatch: Boolean
+        get() = match != null
+
+    val homeClub: ClubResponse?
+        get() = match?.homeClub
+
+    val awayClub: ClubResponse?
+        get() = match?.awayClub
+
     val homeClubName: String
         get() = homeClub?.name ?: "Mi Club"
 

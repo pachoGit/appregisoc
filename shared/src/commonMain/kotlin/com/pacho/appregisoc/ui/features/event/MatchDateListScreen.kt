@@ -22,7 +22,7 @@ import com.pacho.appregisoc.data.dto.EventResponse
 import com.pacho.appregisoc.data.dto.EventStatus
 import com.pacho.appregisoc.data.dto.MatchDateResponse
 import com.pacho.appregisoc.data.dto.MatchDateStatus
-import com.pacho.appregisoc.ui.layouts.MainLayout
+import com.pacho.appregisoc.data.dto.MatchResponse
 
 @Composable
 fun MatchDateListScreen(
@@ -38,12 +38,6 @@ fun MatchDateListScreen(
         onLoad()
     }
 
-    MainLayout(
-        title = "Fechas del Evento",
-        onBackClick = onBack,
-        selectedTab = 1,
-        onTabSelected = onTabSelected
-    ) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -73,7 +67,6 @@ fun MatchDateListScreen(
                 }
             }
         }
-    }
 }
 
 @Composable
@@ -307,26 +300,33 @@ private val previewAwayClub = ClubResponse(
     isActive = true
 )
 
+private val previewMatch = MatchResponse(
+    id = 1,
+    homeClub = previewHomeClub,
+    awayClub = previewAwayClub,
+    scheduledTime = "2026-03-16T16:00:00"
+)
+
 private val previewMatchDates = listOf(
     MatchDateResponse(
-        id = 1, eventId = 1, date = "2026-08-05", startTime = "15:30",
-        location = "Estadio Central", status = MatchDateStatus.UPCOMING,
-        homeClub = previewHomeClub, awayClub = previewAwayClub
+        id = 1, date = "2026-08-05", location = "Estadio Central",
+        status = MatchDateStatus.UPCOMING,
+        match = previewMatch, name = "Fecha 1"
     ),
     MatchDateResponse(
-        id = 2, eventId = 1, date = "2026-08-19", startTime = "15:00",
-        location = "Estadio Central", status = MatchDateStatus.ONGOING,
-        homeClub = previewHomeClub, awayClub = previewAwayClub
+        id = 2, date = "2026-08-19",
+        status = MatchDateStatus.ONGOING,
+        match = previewMatch, name = "Fecha 2"
     ),
     MatchDateResponse(
-        id = 3, eventId = 1, date = "2026-08-26", startTime = "17:00",
-        location = "Polideportivo Sur", status = MatchDateStatus.FINISHED,
-        homeClub = previewHomeClub, awayClub = previewAwayClub
+        id = 3, date = "2026-08-26", location = "Polideportivo Sur",
+        status = MatchDateStatus.FINISHED,
+        match = previewMatch, name = "Fecha 3"
     ),
     MatchDateResponse(
-        id = 4, eventId = 1, date = "2026-09-02", startTime = "15:30",
-        location = "Estadio Central", status = MatchDateStatus.CANCELLED,
-        homeClub = previewHomeClub, awayClub = previewAwayClub
+        id = 4, date = "2026-09-02",
+        status = MatchDateStatus.CANCELED,
+        name = "Fecha 4"
     )
 )
 

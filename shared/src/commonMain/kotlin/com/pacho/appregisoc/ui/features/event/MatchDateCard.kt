@@ -3,6 +3,7 @@ package com.pacho.appregisoc.ui.features.event
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -10,13 +11,16 @@ import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -24,6 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.pacho.appregisoc.data.dto.ClubResponse
 import com.pacho.appregisoc.data.dto.MatchDateResponse
 import com.pacho.appregisoc.data.dto.MatchDateStatus
+import com.pacho.appregisoc.data.dto.MatchResponse
+import com.pacho.appregisoc.data.dto.MatchStatus
 
 @Composable
 fun MatchDateCard(
@@ -60,7 +66,7 @@ fun MatchDateCard(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "${matchDate.homeClubName} vs ${matchDate.awayClubName}",
+                    text = "${matchDate.name}",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -75,6 +81,15 @@ fun MatchDateCard(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                val match = matchDate.match
+                if (match != null) {
+                    MatchTeamsRow(match = match)
+                } else {
+                    NoMatchAssignedRow()
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -83,11 +98,12 @@ fun MatchDateCard(
                         icon = Icons.Default.DateRange,
                         text = matchDate.date
                     )
-                    if (!matchDate.startTime.isNullOrBlank()) {
+                    val scheduledTime = match?.scheduledTime?.let { formatScheduledTime(it) }
+                    if (!scheduledTime.isNullOrBlank()) {
                         Spacer(modifier = Modifier.width(16.dp))
                         MatchDateMeta(
                             icon = Icons.Default.Schedule,
-                            text = matchDate.startTime
+                            text = scheduledTime
                         )
                     }
                     if (!matchDate.location.isNullOrBlank()) {
@@ -155,6 +171,112 @@ fun MatchDateCard(
 }
 
 @Composable
+private fun MatchTeamsRow(
+    match: MatchResponse
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        MatchTeamColumn(
+            label = "Local",
+            club = match.homeClub,
+            modifier = Modifier.weight(1f)
+        )
+
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        ) {
+            Text(
+                text = "VS",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+            )
+        }
+
+        MatchTeamColumn(
+            label = "Visitante",
+            club = match.awayClub,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun MatchTeamColumn(
+    label: String,
+    club: ClubResponse?,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(horizontal = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.SportsSoccer,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = club?.name ?: "Sin asignar",
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun NoMatchAssignedRow() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.SportsSoccer,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Aún no tiene rival o partido asignado",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
 private fun MatchDateMeta(
     icon: ImageVector,
     text: String
@@ -175,6 +297,11 @@ private fun MatchDateMeta(
     }
 }
 
+private fun formatScheduledTime(value: String): String {
+    val time = value.substringAfter("T", missingDelimiterValue = value)
+    return if (time.length >= 5) time.take(5) else time
+}
+
 private val previewHomeClub = ClubResponse(
     id = 1,
     name = "Club Deportivo Estrella",
@@ -191,15 +318,28 @@ private val previewAwayClub = ClubResponse(
     isActive = true
 )
 
+private val previewMatch = MatchResponse(
+    id = 1,
+    homeClub = previewHomeClub,
+    awayClub = previewAwayClub,
+    scheduledTime = "2026-03-16T16:00:00",
+    status = MatchStatus.UPCOMING
+)
+
 private val previewMatchDate = MatchDateResponse(
     id = 1,
-    eventId = 1,
     date = "2026-08-05",
-    startTime = "15:30",
     location = "Estadio Central",
     status = MatchDateStatus.ONGOING,
-    homeClub = previewHomeClub,
-    awayClub = previewAwayClub
+    name = "Fecha 10",
+    match = previewMatch
+)
+
+private val previewMatchDateWithoutMatch = MatchDateResponse(
+    id = 2,
+    date = "2026-08-19",
+    status = MatchDateStatus.UPCOMING,
+    name = "Fecha 11"
 )
 
 @Preview
@@ -208,6 +348,18 @@ private fun MatchDateCardPreview() {
     MaterialTheme {
         MatchDateCard(
             matchDate = previewMatchDate,
+            onView = {},
+            onRegisterLineup = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun MatchDateCardWithoutMatchPreview() {
+    MaterialTheme {
+        MatchDateCard(
+            matchDate = previewMatchDateWithoutMatch,
             onView = {},
             onRegisterLineup = {}
         )

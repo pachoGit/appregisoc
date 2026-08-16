@@ -1,7 +1,7 @@
 package com.pacho.appregisoc.ui.navigation
 
-import com.pacho.appregisoc.data.dto.ClubResponse
 import com.pacho.appregisoc.data.dto.CoachResponse
+import com.pacho.appregisoc.data.dto.ClubResponse
 import com.pacho.appregisoc.data.dto.EventResponse
 import com.pacho.appregisoc.data.dto.MatchDateResponse
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
@@ -9,28 +9,42 @@ import com.pacho.appregisoc.data.dto.PlayerResponse
 
 sealed class Screen {
     data object Home : Screen()
-    data object ClubList : Screen()
-    data object ClubCreate : Screen()
-    data class ClubEdit(val club: ClubResponse) : Screen()
-    data class ClubDetail(val club: ClubResponse) : Screen()
 
-    data object EventList : Screen()
-    data object EventCreate : Screen()
-    data class EventEdit(val event: EventResponse) : Screen()
-    data class EventDetail(val event: EventResponse) : Screen()
-    data class MatchDateList(val event: EventResponse) : Screen()
-    data class MatchDateDetail(val event: EventResponse, val matchDate: MatchDateResponse) : Screen()
+    sealed class Club : Screen() {
+        data object List : Club()
+        data object Create : Club()
+        data class Edit(val club: ClubResponse) : Club()
+        data class Detail(val club: ClubResponse) : Club()
+    }
 
-    data object Staff : Screen()
-    data object PlayerCreate : Screen()
-    data class PlayerEdit(val player: PlayerResponse) : Screen()
-    data class PlayerDetail(val player: PlayerResponse) : Screen()
+    sealed class Event : Screen() {
+        data object List : Event()
+        data object Create : Event()
+        data class Edit(val event: EventResponse) : Event()
+        data class Detail(val event: EventResponse) : Event()
+        data class MatchDateList(val event: EventResponse) : Event()
+        data class MatchDateDetail(val event: EventResponse, val matchDate: MatchDateResponse) : Event()
+    }
 
-    data object CoachCreate : Screen()
-    data class CoachEdit(val coach: CoachResponse) : Screen()
-    data class CoachDetail(val coach: CoachResponse) : Screen()
+    sealed class Staff : Screen() {
+        data object Overview : Staff()
+    }
 
-    data object PhysicalTrainerCreate : Screen()
-    data class PhysicalTrainerEdit(val trainer: PhysicalTrainerResponse) : Screen()
-    data class PhysicalTrainerDetail(val trainer: PhysicalTrainerResponse) : Screen()
+    sealed class Player : Screen() {
+        data object Create : Player()
+        data class Edit(val player: PlayerResponse) : Player()
+        data class Detail(val player: PlayerResponse) : Player()
+    }
+
+    sealed class Coach : Screen() {
+        data object Create : Coach()
+        data class Edit(val coach: CoachResponse) : Coach()
+        data class Detail(val coach: CoachResponse) : Coach()
+    }
+
+    sealed class PhysicalTrainer : Screen() {
+        data object Create : PhysicalTrainer()
+        data class Edit(val trainer: PhysicalTrainerResponse) : PhysicalTrainer()
+        data class Detail(val trainer: PhysicalTrainerResponse) : PhysicalTrainer()
+    }
 }
