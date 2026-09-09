@@ -4,8 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-class AppNavigator {
-    var currentScreen by mutableStateOf<Screen>(Screen.Home)
+class AppNavigator(
+    initialScreen: Screen = Screen.Login
+) {
+    var currentScreen by mutableStateOf<Screen>(initialScreen)
         private set
 
     fun navigateTo(screen: Screen) {
@@ -19,5 +21,9 @@ class AppNavigator {
             2 -> Screen.Staff.Overview
             else -> Screen.Home
         }
+    }
+
+    fun navigateToLogin() {
+        currentScreen = Screen.Login
     }
 }

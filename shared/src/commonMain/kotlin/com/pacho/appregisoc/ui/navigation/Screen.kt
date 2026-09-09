@@ -9,6 +9,7 @@ import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import com.pacho.appregisoc.data.dto.PlayerResponse
 
 sealed class Screen {
+    data object Login : Screen()
     data object Home : Screen()
 
     sealed class Club : Screen() {

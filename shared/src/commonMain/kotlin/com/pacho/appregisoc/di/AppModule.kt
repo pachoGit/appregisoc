@@ -11,7 +11,9 @@ import com.pacho.appregisoc.data.PhysicalTrainerApiService
 import com.pacho.appregisoc.data.PlayerApiService
 import com.pacho.appregisoc.data.apiBaseUrl
 import com.pacho.appregisoc.data.createHttpClient
+import com.pacho.appregisoc.data.http.AuthBearer
 import com.pacho.appregisoc.data.mock.MockPhotoUploadDataSource
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.repository.AuthRepository
 import com.pacho.appregisoc.domain.repository.CoachRepository
 import com.pacho.appregisoc.domain.repository.ClubRepository
@@ -35,6 +37,8 @@ import com.pacho.appregisoc.domain.usecase.GetMatchDatesUseCase
 import com.pacho.appregisoc.domain.usecase.GetLineupUseCase
 import com.pacho.appregisoc.domain.usecase.GetPhysicalTrainersUseCase
 import com.pacho.appregisoc.domain.usecase.GetPlayersUseCase
+import com.pacho.appregisoc.domain.usecase.LoginUseCase
+import com.pacho.appregisoc.domain.usecase.LogoutUseCase
 import com.pacho.appregisoc.domain.usecase.SaveCoachUseCase
 import com.pacho.appregisoc.domain.usecase.SavePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.SaveLineupUseCase
@@ -44,7 +48,14 @@ import com.pacho.appregisoc.domain.usecase.UpdateEventUseCase
 import com.pacho.appregisoc.domain.usecase.UploadPhotoUseCase
 
 class AppModule {
-    private val httpClient = createHttpClient()
+    val sessionManager = SessionManager()
+
+    private val httpClient = createHttpClient().config {
+        install(AuthBearer) {
+            tokenProvider = { sessionManager.token }
+        }
+    }
+
     private val playerRepository: PlayerRepository = PlayerApiService(httpClient, "$apiBaseUrl/players")
 
     private val clubRepository: ClubRepository = ClubApiService(httpClient, "$apiBaseUrl/clubs")
@@ -62,6 +73,9 @@ class AppModule {
     private val authRepository: AuthRepository = AuthApiService(httpClient, "$apiBaseUrl/auth")
 
     private val photoUploadDataSource: PhotoUploadDataSource = MockPhotoUploadDataSource()
+
+    val loginUseCase = LoginUseCase(authRepository, sessionManager)
+    val logoutUseCase = LogoutUseCase(sessionManager)
 
     val getPlayersUseCase = GetPlayersUseCase(playerRepository)
     val savePlayerUseCase = SavePlayerUseCase(playerRepository)

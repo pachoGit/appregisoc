@@ -26,6 +26,8 @@ import com.pacho.appregisoc.ui.features.event.MatchDateViewModel
 import com.pacho.appregisoc.ui.features.home.HomeRoute
 import com.pacho.appregisoc.ui.features.lineup.LineupRoute
 import com.pacho.appregisoc.ui.features.lineup.LineupViewModel
+import com.pacho.appregisoc.ui.features.login.LoginRoute
+import com.pacho.appregisoc.ui.features.login.LoginViewModel
 import com.pacho.appregisoc.ui.features.physicaltrainer.PhysicalTrainerRoute
 import com.pacho.appregisoc.ui.features.physicaltrainer.PhysicalTrainerViewModel
 import com.pacho.appregisoc.ui.features.player.PlayerRoute
@@ -41,6 +43,11 @@ fun App() {
     val navigator = remember { AppNavigator() }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val loginViewModel: LoginViewModel = viewModel {
+        LoginViewModel(
+            loginUseCase = appModule.loginUseCase
+        )
+    }
     val playerViewModel: PlayerViewModel = viewModel {
         PlayerViewModel(
             getPlayersUseCase = appModule.getPlayersUseCase,
@@ -115,6 +122,7 @@ fun App() {
 
     LaunchedEffect(Unit) {
         merge(
+            loginViewModel.snackBarMessage,
             playerViewModel.snackBarMessage,
             clubViewModel.snackBarMessage,
             coachViewModel.snackBarMessage,
@@ -132,6 +140,12 @@ fun App() {
             Box(modifier = Modifier.fillMaxSize()) {
                 val snackbarHost: @Composable () -> Unit = { SnackbarHost(snackbarHostState) }
                 when (val screen = navigator.currentScreen) {
+                    is Screen.Login -> LoginRoute(
+                        viewModel = loginViewModel,
+                        sessionManager = appModule.sessionManager,
+                        navigator = navigator,
+                        snackbarHost = snackbarHost
+                    )
                     is Screen.Home -> HomeRoute(
                         uiState = clubUiState,
                         navigator = navigator,
