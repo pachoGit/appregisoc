@@ -4,6 +4,7 @@ import com.pacho.appregisoc.data.dto.CoachResponse
 import com.pacho.appregisoc.data.dto.ClubResponse
 import com.pacho.appregisoc.data.dto.EventResponse
 import com.pacho.appregisoc.data.dto.MatchDateResponse
+import com.pacho.appregisoc.data.dto.MatchResponse
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import com.pacho.appregisoc.data.dto.PlayerResponse
 
@@ -47,4 +48,10 @@ sealed class Screen {
         data class Edit(val trainer: PhysicalTrainerResponse) : PhysicalTrainer()
         data class Detail(val trainer: PhysicalTrainerResponse) : PhysicalTrainer()
     }
+
+    data class Lineup(
+        val match: MatchResponse,
+        val matchDate: MatchDateResponse,
+        val event: EventResponse
+    ) : Screen()
 }

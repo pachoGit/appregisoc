@@ -150,20 +150,22 @@ fun MatchDateCard(
                         modifier = Modifier.padding(horizontal = 12.dp),
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                     )
-                    DropdownMenuItem(
-                        text = { Text("Registrar plantilla") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Group,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        onClick = {
-                            showMenu = false
-                            onRegisterLineup()
-                        }
-                    )
+                    if (matchDate.match != null) {
+                        DropdownMenuItem(
+                            text = { Text("Registrar plantilla") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Group,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            onClick = {
+                                showMenu = false
+                                onRegisterLineup()
+                            }
+                        )
+                    }
                 }
             }
         }

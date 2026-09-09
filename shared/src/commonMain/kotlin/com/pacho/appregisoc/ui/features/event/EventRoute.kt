@@ -75,7 +75,9 @@ fun EventRoute(
                     onBack = { navigator.navigateTo(Screen.Event.Detail(screen.event)) },
                     onTabSelected = navigator::navigateToTab,
                     onViewDate = { navigator.navigateTo(Screen.Event.MatchDateDetail(screen.event, it)) },
-                    onRegisterLineup = { navigator.navigateToTab(2) }
+                    onRegisterLineup = { matchDate ->
+                        matchDate.match?.let { navigator.navigateTo(Screen.Lineup(it, matchDate, screen.event)) }
+                    }
                 )
             }
         }
@@ -83,7 +85,10 @@ fun EventRoute(
             MatchDateDetailScreen(
                 matchDate = screen.matchDate,
                 onBack = { navigator.navigateTo(Screen.Event.MatchDateList(screen.event)) },
-                onTabSelected = navigator::navigateToTab
+                onTabSelected = navigator::navigateToTab,
+                onOpenLineup = {
+                    screen.matchDate.match?.let { navigator.navigateTo(Screen.Lineup(it, screen.matchDate, screen.event)) }
+                }
             )
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -30,7 +31,8 @@ import com.pacho.appregisoc.ui.layouts.MainLayout
 fun MatchDateDetailScreen(
     matchDate: MatchDateResponse,
     onBack: () -> Unit,
-    onTabSelected: (Int) -> Unit
+    onTabSelected: (Int) -> Unit,
+    onOpenLineup: () -> Unit = {}
 ) {
     MainLayout(
         title = "Detalle de la Fecha",
@@ -53,6 +55,22 @@ fun MatchDateDetailScreen(
             MatchDateStatusBadge(status = matchDate.status)
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            if (matchDate.match != null) {
+                Button(
+                    onClick = onOpenLineup,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Group,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Ver o generar alineación")
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             InfoSection(title = "Información de la Fecha") {
                 InfoRow(label = "Estado", value = matchDate.status.displayLabel)

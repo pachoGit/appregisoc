@@ -24,6 +24,8 @@ import com.pacho.appregisoc.ui.features.event.EventRoute
 import com.pacho.appregisoc.ui.features.event.EventViewModel
 import com.pacho.appregisoc.ui.features.event.MatchDateViewModel
 import com.pacho.appregisoc.ui.features.home.HomeRoute
+import com.pacho.appregisoc.ui.features.lineup.LineupRoute
+import com.pacho.appregisoc.ui.features.lineup.LineupViewModel
 import com.pacho.appregisoc.ui.features.physicaltrainer.PhysicalTrainerRoute
 import com.pacho.appregisoc.ui.features.physicaltrainer.PhysicalTrainerViewModel
 import com.pacho.appregisoc.ui.features.player.PlayerRoute
@@ -85,6 +87,16 @@ fun App() {
             getMatchDatesUseCase = appModule.getMatchDatesUseCase
         )
     }
+    val lineupViewModel: LineupViewModel = viewModel {
+        LineupViewModel(
+            getLineupUseCase = appModule.getLineupUseCase,
+            saveLineupUseCase = appModule.saveLineupUseCase,
+            closeLineupUseCase = appModule.closeLineupUseCase,
+            getPlayersUseCase = appModule.getPlayersUseCase,
+            getCoachesUseCase = appModule.getCoachesUseCase,
+            getPhysicalTrainersUseCase = appModule.getPhysicalTrainersUseCase
+        )
+    }
 
     val playerUiState by playerViewModel.uiState.collectAsState()
     val clubUiState by clubViewModel.uiState.collectAsState()
@@ -107,7 +119,8 @@ fun App() {
             clubViewModel.snackBarMessage,
             coachViewModel.snackBarMessage,
             physicalTrainerViewModel.snackBarMessage,
-            eventViewModel.snackBarMessage
+            eventViewModel.snackBarMessage,
+            lineupViewModel.snackBarMessage
         ).collect { message ->
             snackbarHostState.showSnackbar(message)
         }
@@ -166,6 +179,12 @@ fun App() {
                         screen = screen,
                         viewModel = physicalTrainerViewModel,
                         navigator = navigator
+                    )
+                    is Screen.Lineup -> LineupRoute(
+                        screen = screen,
+                        viewModel = lineupViewModel,
+                        navigator = navigator,
+                        snackbarHost = snackbarHost
                     )
                 }
             }
