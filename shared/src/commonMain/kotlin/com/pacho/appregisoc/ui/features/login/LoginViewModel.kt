@@ -3,6 +3,7 @@ package com.pacho.appregisoc.ui.features.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.LoginUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,8 +28,13 @@ data class LoginFormState(
 )
 
 class LoginViewModel(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
+
+    companion object {
+        private const val ALLOWED_ROLE = "CLUB_MANAGER"
+    }
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -52,6 +58,12 @@ class LoginViewModel(
     }
 
     fun onMockLoginSuccess() {
+        val role = sessionManager.role
+        if (role != ALLOWED_ROLE) {
+            sessionManager.clearSession()
+            _uiState.value = LoginUiState.Error("Acceso no autorizado. Solo usuarios con rol CLUB_MANAGER pueden ingresar.")
+            return
+        }
         _uiState.value = LoginUiState.Success
     }
 
@@ -74,7 +86,17 @@ class LoginViewModel(
                 password = state.password
             )
             when (result) {
-                is Result.Success -> _uiState.value = LoginUiState.Success
+                is Result.Success -> {
+                    val role = sessionManager.role
+                    if (role != ALLOWED_ROLE) {
+                        sessionManager.clearSession()
+                        val errorMsg = "Acceso no autorizado. Solo usuarios con rol CLUB_MANAGER pueden ingresar."
+                        _uiState.value = LoginUiState.Error(errorMsg)
+                        _snackBarMessage.emit(errorMsg)
+                    } else {
+                        _uiState.value = LoginUiState.Success
+                    }
+                }
                 is Result.Error -> {
                     _uiState.value = LoginUiState.Error(result.message)
                     _snackBarMessage.emit(result.message)

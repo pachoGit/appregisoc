@@ -16,7 +16,7 @@ class SavePhysicalTrainerUseCase(
         documentNumber: String,
         age: String,
         dateOfBirth: String,
-        clubId: Long = 1L,
+        clubId: Long,
         photoUrl: String? = null,
         documentFrontUrl: String? = null,
         documentBackUrl: String? = null

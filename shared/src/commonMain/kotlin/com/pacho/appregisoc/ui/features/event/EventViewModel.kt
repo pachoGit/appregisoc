@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.EventResponse
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.CreateEventUseCase
 import com.pacho.appregisoc.domain.usecase.DeleteEventUseCase
 import com.pacho.appregisoc.domain.usecase.GetEventsUseCase
@@ -21,7 +22,8 @@ class EventViewModel(
     private val getEventsUseCase: GetEventsUseCase,
     private val createEventUseCase: CreateEventUseCase,
     private val updateEventUseCase: UpdateEventUseCase,
-    private val deleteEventUseCase: DeleteEventUseCase
+    private val deleteEventUseCase: DeleteEventUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<EventUiState>(EventUiState.Loading)
@@ -33,10 +35,13 @@ class EventViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    fun loadEvents(clubId: Long = 1L) {
+    val clubId: Long
+        get() = sessionManager.clubId
+
+    fun loadEvents() {
         viewModelScope.launch {
             _uiState.value = EventUiState.Loading
-            when (val result = getEventsUseCase(clubId)) {
+            when (val result = getEventsUseCase(sessionManager.clubId)) {
                 is Result.Error -> _uiState.value = EventUiState.Error(result.message)
                 is Result.Success -> _uiState.value = EventUiState.Success(result.data)
             }
@@ -48,7 +53,7 @@ class EventViewModel(
             _isLoading.value = true
             try {
                 val result = createEventUseCase(
-                    clubId = formState.clubId,
+                    clubId = sessionManager.clubId,
                     title = formState.title,
                     description = formState.description.ifBlank { null },
                     location = formState.location.ifBlank { null },
@@ -60,7 +65,7 @@ class EventViewModel(
                     is Result.Error -> _snackBarMessage.emit(result.message)
                     is Result.Success -> {
                         _snackBarMessage.emit("Evento registrado correctamente")
-                        loadEvents(formState.clubId)
+                        loadEvents()
                     }
                 }
             } finally {
@@ -87,7 +92,7 @@ class EventViewModel(
                     is Result.Error -> _snackBarMessage.emit(result.message)
                     is Result.Success -> {
                         _snackBarMessage.emit("Evento actualizado correctamente")
-                        loadEvents(formState.clubId)
+                        loadEvents()
                     }
                 }
             } finally {

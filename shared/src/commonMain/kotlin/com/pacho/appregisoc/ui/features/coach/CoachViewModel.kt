@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.CoachResponse
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.DeleteCoachUseCase
 import com.pacho.appregisoc.domain.usecase.GetCoachesUseCase
 import com.pacho.appregisoc.domain.usecase.SaveCoachUseCase
@@ -23,7 +24,8 @@ class CoachViewModel(
     private val getCoachesUseCase: GetCoachesUseCase,
     private val saveCoachUseCase: SaveCoachUseCase,
     private val deleteCoachUseCase: DeleteCoachUseCase,
-    private val uploadPhotoUseCase: UploadPhotoUseCase
+    private val uploadPhotoUseCase: UploadPhotoUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CoachUiState>(CoachUiState.Loading)
@@ -35,10 +37,13 @@ class CoachViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    fun loadCoaches(clubId: Long = 1L) {
+    val clubId: Long
+        get() = sessionManager.clubId
+
+    fun loadCoaches() {
         viewModelScope.launch {
             _uiState.value = CoachUiState.Loading
-            when (val result = getCoachesUseCase(clubId)) {
+            when (val result = getCoachesUseCase(sessionManager.clubId)) {
                 is Result.Error -> _uiState.value = CoachUiState.Error(result.message)
                 is Result.Success -> _uiState.value = CoachUiState.Success(result.data)
             }
@@ -56,7 +61,7 @@ class CoachViewModel(
                     documentNumber = formState.documentNumber,
                     age = formState.age,
                     dateOfBirth = formState.dateOfBirth,
-                    clubId = formState.clubId,
+                    clubId = sessionManager.clubId,
                     photoUrl = formState.photoUrl.ifBlank { null },
                     documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
                     documentBackUrl = formState.documentBackUrl.ifBlank { null }
@@ -68,7 +73,7 @@ class CoachViewModel(
                             if (formState.isEditing) "Entrenador actualizado correctamente"
                             else "Entrenador registrado correctamente"
                         )
-                        loadCoaches(formState.clubId)
+                        loadCoaches()
                     }
                 }
             } finally {

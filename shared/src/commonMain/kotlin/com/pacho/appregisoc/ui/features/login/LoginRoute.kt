@@ -40,7 +40,7 @@ fun LoginRoute(
                         token = "mock-token-12345",
                         userId = 1L,
                         username = formState.username.ifBlank { "admin" },
-                        role = "ADMIN",
+                        role = "CLUB_MANAGER",
                         clubId = 1L
                     )
                 )
@@ -51,7 +51,7 @@ fun LoginRoute(
                         surname = "Mock",
                         documentNumber = "12345678",
                         username = formState.username.ifBlank { "admin" },
-                        role = "ADMIN",
+                        role = "CLUB_MANAGER",
                         club = ClubInfoResponse(id = 1L, name = "Club Mock")
                     )
                 )

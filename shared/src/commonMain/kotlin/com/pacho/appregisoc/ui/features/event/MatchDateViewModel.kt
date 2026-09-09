@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.MatchDateResponse
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.GetMatchDatesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,16 +18,20 @@ sealed class MatchDateUiState {
 }
 
 class MatchDateViewModel(
-    private val getMatchDatesUseCase: GetMatchDatesUseCase
+    private val getMatchDatesUseCase: GetMatchDatesUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MatchDateUiState>(MatchDateUiState.Loading)
     val uiState: StateFlow<MatchDateUiState> = _uiState.asStateFlow()
 
-    fun loadMatchDates(eventId: Long, clubId: Long = 1L) {
+    val clubId: Long
+        get() = sessionManager.clubId
+
+    fun loadMatchDates(eventId: Long) {
         viewModelScope.launch {
             _uiState.value = MatchDateUiState.Loading
-            when (val result = getMatchDatesUseCase(eventId, clubId)) {
+            when (val result = getMatchDatesUseCase(eventId, sessionManager.clubId)) {
                 is Result.Error -> _uiState.value = MatchDateUiState.Error(result.message)
                 is Result.Success -> _uiState.value = MatchDateUiState.Success(result.data)
             }

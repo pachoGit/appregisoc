@@ -42,10 +42,12 @@ fun App() {
     val appModule = remember { AppModule() }
     val navigator = remember { AppNavigator() }
     val snackbarHostState = remember { SnackbarHostState() }
+    val sessionManager = appModule.sessionManager
 
     val loginViewModel: LoginViewModel = viewModel {
         LoginViewModel(
-            loginUseCase = appModule.loginUseCase
+            loginUseCase = appModule.loginUseCase,
+            sessionManager = sessionManager
         )
     }
     val playerViewModel: PlayerViewModel = viewModel {
@@ -53,7 +55,8 @@ fun App() {
             getPlayersUseCase = appModule.getPlayersUseCase,
             savePlayerUseCase = appModule.savePlayerUseCase,
             deletePlayerUseCase = appModule.deletePlayerUseCase,
-            uploadPhotoUseCase = appModule.uploadPhotoUseCase
+            uploadPhotoUseCase = appModule.uploadPhotoUseCase,
+            sessionManager = sessionManager
         )
     }
     val clubViewModel: ClubViewModel = viewModel {
@@ -70,7 +73,8 @@ fun App() {
             getCoachesUseCase = appModule.getCoachesUseCase,
             saveCoachUseCase = appModule.saveCoachUseCase,
             deleteCoachUseCase = appModule.deleteCoachUseCase,
-            uploadPhotoUseCase = appModule.uploadPhotoUseCase
+            uploadPhotoUseCase = appModule.uploadPhotoUseCase,
+            sessionManager = sessionManager
         )
     }
     val physicalTrainerViewModel: PhysicalTrainerViewModel = viewModel {
@@ -78,7 +82,8 @@ fun App() {
             getPhysicalTrainersUseCase = appModule.getPhysicalTrainersUseCase,
             savePhysicalTrainerUseCase = appModule.savePhysicalTrainerUseCase,
             deletePhysicalTrainerUseCase = appModule.deletePhysicalTrainerUseCase,
-            uploadPhotoUseCase = appModule.uploadPhotoUseCase
+            uploadPhotoUseCase = appModule.uploadPhotoUseCase,
+            sessionManager = sessionManager
         )
     }
     val eventViewModel: EventViewModel = viewModel {
@@ -86,12 +91,14 @@ fun App() {
             getEventsUseCase = appModule.getEventsUseCase,
             createEventUseCase = appModule.createEventUseCase,
             updateEventUseCase = appModule.updateEventUseCase,
-            deleteEventUseCase = appModule.deleteEventUseCase
+            deleteEventUseCase = appModule.deleteEventUseCase,
+            sessionManager = sessionManager
         )
     }
     val matchDateViewModel: MatchDateViewModel = viewModel {
         MatchDateViewModel(
-            getMatchDatesUseCase = appModule.getMatchDatesUseCase
+            getMatchDatesUseCase = appModule.getMatchDatesUseCase,
+            sessionManager = sessionManager
         )
     }
     val lineupViewModel: LineupViewModel = viewModel {
@@ -101,7 +108,8 @@ fun App() {
             closeLineupUseCase = appModule.closeLineupUseCase,
             getPlayersUseCase = appModule.getPlayersUseCase,
             getCoachesUseCase = appModule.getCoachesUseCase,
-            getPhysicalTrainersUseCase = appModule.getPhysicalTrainersUseCase
+            getPhysicalTrainersUseCase = appModule.getPhysicalTrainersUseCase,
+            sessionManager = sessionManager
         )
     }
 
@@ -142,7 +150,7 @@ fun App() {
                 when (val screen = navigator.currentScreen) {
                     is Screen.Login -> LoginRoute(
                         viewModel = loginViewModel,
-                        sessionManager = appModule.sessionManager,
+                        sessionManager = sessionManager,
                         navigator = navigator,
                         snackbarHost = snackbarHost
                     )

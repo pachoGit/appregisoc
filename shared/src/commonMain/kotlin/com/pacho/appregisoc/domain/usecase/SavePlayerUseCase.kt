@@ -16,7 +16,7 @@ class SavePlayerUseCase(
         documentNumber: String,
         age: String,
         dateOfBirth: String,
-        clubId: Long = 1L,
+        clubId: Long,
         position: com.pacho.appregisoc.data.dto.PlayerPosition? = null,
         photoUrl: String? = null,
         documentFrontUrl: String? = null,

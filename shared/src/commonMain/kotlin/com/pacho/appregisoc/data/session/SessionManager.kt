@@ -12,7 +12,7 @@ data class SessionData(
     val userId: Long = 0,
     val username: String = "",
     val role: String = "",
-    val clubId: Long? = null,
+    val clubId: Long = 0,
     val me: MeResponse? = null
 )
 
@@ -34,6 +34,12 @@ class SessionManager {
 
     val token: String
         get() = _sessionData.value.token
+
+    val clubId: Long
+        get() = _sessionData.value.clubId
+
+    val role: String
+        get() = _sessionData.value.role
 
     fun saveLoginResponse(response: LoginResponse) {
         _sessionData.update {

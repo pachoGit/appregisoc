@@ -6,6 +6,7 @@ import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.CoachResponse
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
 import com.pacho.appregisoc.data.dto.PlayerResponse
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.CloseLineupUseCase
 import com.pacho.appregisoc.domain.usecase.GetCoachesUseCase
 import com.pacho.appregisoc.domain.usecase.GetLineupUseCase
@@ -39,7 +40,8 @@ class LineupViewModel(
     private val closeLineupUseCase: CloseLineupUseCase,
     private val getPlayersUseCase: GetPlayersUseCase,
     private val getCoachesUseCase: GetCoachesUseCase,
-    private val getPhysicalTrainersUseCase: GetPhysicalTrainersUseCase
+    private val getPhysicalTrainersUseCase: GetPhysicalTrainersUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LineupUiState>(LineupUiState.Loading)
@@ -64,11 +66,13 @@ class LineupViewModel(
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
     private val matchId = MutableStateFlow(0L)
-    private val clubId = MutableStateFlow(1L)
 
-    fun load(matchId: Long, clubId: Long = 1L) {
+    val clubId: Long
+        get() = sessionManager.clubId
+
+    fun load(matchId: Long) {
         this.matchId.value = matchId
-        this.clubId.value = clubId
+        val clubId = sessionManager.clubId
         viewModelScope.launch {
             _uiState.value = LineupUiState.Loading
             when (val result = getLineupUseCase(matchId, clubId)) {
@@ -168,7 +172,7 @@ class LineupViewModel(
             val result = saveLineupUseCase(
                 id = state.lineupId,
                 matchId = matchId.value,
-                clubId = clubId.value,
+                clubId = sessionManager.clubId,
                 playerIds = state.playerIds.toList(),
                 coachId = state.coachId,
                 physicalTrainerId = state.physicalTrainerId

@@ -15,8 +15,7 @@ data class CoachFormState(
     val dateOfBirth: String = "",
     val errors: Map<String, String> = emptyMap(),
     val isEditing: Boolean = false,
-    val editingCoachId: Long? = null,
-    val clubId: Long = 1L
+    val editingCoachId: Long? = null
 ) : PhotoFormState {
     val photoUrl: String get() = photoState.remoteUrl ?: ""
     val documentFrontUrl: String get() = dniFrontPhotoState.remoteUrl ?: ""
@@ -33,8 +32,7 @@ data class CoachFormState(
             dniFrontPhotoState = PhotoPickerState(remoteUrl = coach.documentFrontUrl),
             dniBackPhotoState = PhotoPickerState(remoteUrl = coach.documentBackUrl),
             isEditing = true,
-            editingCoachId = coach.id,
-            clubId = coach.clubId
+            editingCoachId = coach.id
         )
     }
 }

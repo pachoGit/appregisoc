@@ -15,7 +15,7 @@ class MockAuthRepository : AuthRepository {
                 token = "mock-token-12345",
                 userId = 1L,
                 username = request.username,
-                role = "ADMIN",
+                role = "CLUB_MANAGER",
                 clubId = 1L
             )
         )
@@ -29,7 +29,7 @@ class MockAuthRepository : AuthRepository {
                 surname = "Mock",
                 documentNumber = "12345678",
                 username = "admin",
-                role = "ADMIN",
+                role = "CLUB_MANAGER",
                 club = ClubInfoResponse(id = 1L, name = "Club Mock")
             )
         )

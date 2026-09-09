@@ -4,7 +4,6 @@ import com.pacho.appregisoc.data.dto.EventResponse
 import com.pacho.appregisoc.data.dto.EventStatus
 
 data class EventFormState(
-    val clubId: Long = 1L,
     val title: String = "",
     val description: String = "",
     val location: String = "",

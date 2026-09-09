@@ -17,7 +17,6 @@ data class PlayerFormState(
     val errors: Map<String, String> = emptyMap(),
     val isEditing: Boolean = false,
     val editingPlayerId: Long? = null,
-    val clubId: Long = 1L,
     val position: PlayerPosition? = null
 ) : PhotoFormState {
     val photoUrl: String get() = photoState.remoteUrl ?: ""
@@ -36,7 +35,6 @@ data class PlayerFormState(
             dniBackPhotoState = PhotoPickerState(remoteUrl = player.documentBackUrl),
             isEditing = true,
             editingPlayerId = player.id,
-            clubId = player.clubId,
             position = player.position
         )
     }

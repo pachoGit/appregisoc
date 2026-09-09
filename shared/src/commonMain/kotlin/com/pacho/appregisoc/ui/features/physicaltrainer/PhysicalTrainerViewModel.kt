@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.PhysicalTrainerResponse
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.DeletePhysicalTrainerUseCase
 import com.pacho.appregisoc.domain.usecase.GetPhysicalTrainersUseCase
 import com.pacho.appregisoc.domain.usecase.SavePhysicalTrainerUseCase
@@ -23,7 +24,8 @@ class PhysicalTrainerViewModel(
     private val getPhysicalTrainersUseCase: GetPhysicalTrainersUseCase,
     private val savePhysicalTrainerUseCase: SavePhysicalTrainerUseCase,
     private val deletePhysicalTrainerUseCase: DeletePhysicalTrainerUseCase,
-    private val uploadPhotoUseCase: UploadPhotoUseCase
+    private val uploadPhotoUseCase: UploadPhotoUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PhysicalTrainerUiState>(PhysicalTrainerUiState.Loading)
@@ -35,15 +37,19 @@ class PhysicalTrainerViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    fun loadPhysicalTrainers(clubId: Long = 1L) {
+    val clubId: Long
+        get() = sessionManager.clubId
+
+    fun loadPhysicalTrainers() {
         viewModelScope.launch {
             _uiState.value = PhysicalTrainerUiState.Loading
-            when(val result = getPhysicalTrainersUseCase(clubId)) {
+            when(val result = getPhysicalTrainersUseCase(sessionManager.clubId)) {
                 is Result.Error -> _uiState.value = PhysicalTrainerUiState.Error(result.message)
                 is Result.Success -> _uiState.value = PhysicalTrainerUiState.Success(result.data)
             }
         }
     }
+
     fun savePhysicalTrainer(formState: PhysicalTrainerFormState) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -55,7 +61,7 @@ class PhysicalTrainerViewModel(
                     documentNumber = formState.documentNumber,
                     age = formState.age,
                     dateOfBirth = formState.dateOfBirth,
-                    clubId = formState.clubId,
+                    clubId = sessionManager.clubId,
                     photoUrl = formState.photoUrl.ifBlank { null },
                     documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
                     documentBackUrl = formState.documentBackUrl.ifBlank { null }
@@ -67,7 +73,7 @@ class PhysicalTrainerViewModel(
                             if (formState.isEditing) "Preparador físico actualizado correctamente"
                             else "Preparador físico registrado correctamente"
                         )
-                        loadPhysicalTrainers(formState.clubId)
+                        loadPhysicalTrainers()
                     }
                 }
             } finally {
@@ -75,6 +81,7 @@ class PhysicalTrainerViewModel(
             }
         }
     }
+
     fun deletePhysicalTrainer(id: Long) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -92,6 +99,7 @@ class PhysicalTrainerViewModel(
             }
         }
     }
+
     fun uploadPhoto(
         imageBytes: ByteArray,
         fileName: String,

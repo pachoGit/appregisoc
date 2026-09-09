@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pacho.appregisoc.core.Result
 import com.pacho.appregisoc.data.dto.PlayerResponse
+import com.pacho.appregisoc.data.session.SessionManager
 import com.pacho.appregisoc.domain.usecase.DeletePlayerUseCase
 import com.pacho.appregisoc.domain.usecase.GetPlayersUseCase
 import com.pacho.appregisoc.domain.usecase.SavePlayerUseCase
@@ -23,7 +24,8 @@ class PlayerViewModel(
     private val getPlayersUseCase: GetPlayersUseCase,
     private val savePlayerUseCase: SavePlayerUseCase,
     private val deletePlayerUseCase: DeletePlayerUseCase,
-    private val uploadPhotoUseCase: UploadPhotoUseCase
+    private val uploadPhotoUseCase: UploadPhotoUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PlayerUiState>(PlayerUiState.Loading)
@@ -35,10 +37,13 @@ class PlayerViewModel(
     private val _snackBarMessage = MutableSharedFlow<String>()
     val snackBarMessage: SharedFlow<String> = _snackBarMessage.asSharedFlow()
 
-    fun loadPlayers(clubId: Long = 1L) {
+    val clubId: Long
+        get() = sessionManager.clubId
+
+    fun loadPlayers() {
         viewModelScope.launch {
             _uiState.value = PlayerUiState.Loading
-            when (val result = getPlayersUseCase(clubId)) {
+            when (val result = getPlayersUseCase(sessionManager.clubId)) {
                 is Result.Error -> _uiState.value = PlayerUiState.Error(result.message)
                 is Result.Success -> _uiState.value = PlayerUiState.Success(result.data)
             }
@@ -56,7 +61,7 @@ class PlayerViewModel(
                     documentNumber = formState.documentNumber,
                     age = formState.age,
                     dateOfBirth = formState.dateOfBirth,
-                    clubId = formState.clubId,
+                    clubId = sessionManager.clubId,
                     position = formState.position,
                     photoUrl = formState.photoUrl.ifBlank { null },
                     documentFrontUrl = formState.documentFrontUrl.ifBlank { null },
@@ -69,7 +74,7 @@ class PlayerViewModel(
                             if (formState.isEditing) "Jugador actualizado correctamente"
                             else "Jugador registrado correctamente"
                         )
-                        loadPlayers(formState.clubId)
+                        loadPlayers()
                     }
                 }
             } finally {
