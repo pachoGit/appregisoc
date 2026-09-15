@@ -42,13 +42,16 @@ class SessionManager {
         get() = _sessionData.value.role
 
     fun saveLoginResponse(response: LoginResponse) {
+        val resolvedClubId = requireNotNull(response.clubId) {
+            "El clubId no puede ser nulo para el rol ${response.role}"
+        }
         _sessionData.update {
             it.copy(
                 token = response.token,
                 userId = response.userId,
                 username = response.username,
                 role = response.role,
-                clubId = response.clubId
+                clubId = resolvedClubId
             )
         }
         _sessionState.value = SessionState.LoggedIn

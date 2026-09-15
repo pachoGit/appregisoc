@@ -8,5 +8,5 @@ data class LoginResponse(
     val userId: Long,
     val username: String,
     val role: String,
-    val clubId: Long
+    val clubId: Long?
 )

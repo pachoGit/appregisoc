@@ -15,7 +15,12 @@ class LoginUseCase(
         val result = authRepository.login(request)
 
         if (result is Result.Success) {
-            sessionManager.saveLoginResponse(result.data)
+            try {
+                sessionManager.saveLoginResponse(result.data)
+            }
+            catch(_: Exception) {
+                return Result.Error("Error al iniciar sesion: Este usuario no puede acceder desde esta plataforma")
+            }
             val meResult = authRepository.me()
             if (meResult is Result.Success) {
                 sessionManager.saveMeResponse(meResult.data)
