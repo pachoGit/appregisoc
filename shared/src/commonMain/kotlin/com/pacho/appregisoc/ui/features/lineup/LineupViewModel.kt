@@ -81,7 +81,7 @@ class LineupViewModel(
                     val lineup = result.data
                     _uiState.value = LineupUiState.Success(
                         lineupId = lineup?.id,
-                        isClosed = false,
+                        isClosed = lineup?.isClosed ?: false,
                         playerIds = lineup?.playerIds ?: emptySet(),
                         coachId = lineup?.coach?.coachId,
                         physicalTrainerId = lineup?.physicalTrainer?.physicalTrainerId
@@ -150,13 +150,12 @@ class LineupViewModel(
             viewModelScope.launch {
                 _isSaving.value = true
                 when (val result = closeLineupUseCase(state.lineupId)) {
-                    is Result.Error -> _snackBarMessage.emit(result.message)
-                    is Result.Success -> {
-                        _uiState.value = state.copy(isClosed = true)
-                        _snackBarMessage.emit("Planilla cerrada definitivamente")
+                    is Result.Error -> {
+                        _isSaving.value = false
+                        _snackBarMessage.emit(result.message)
                     }
+                    is Result.Success -> refreshFromServer("Planilla cerrada definitivamente")
                 }
-                _isSaving.value = false
             }
         } else {
             persist(isClose = true)
@@ -169,30 +168,81 @@ class LineupViewModel(
 
         viewModelScope.launch {
             _isSaving.value = true
-            val result = saveLineupUseCase(
+            when (val result = saveLineupUseCase(
                 id = state.lineupId,
                 matchId = matchId.value,
                 clubId = sessionManager.clubId,
                 playerIds = state.playerIds.toList(),
                 coachId = state.coachId,
                 physicalTrainerId = state.physicalTrainerId
-            )
-            _isSaving.value = false
-            when (result) {
-                is Result.Error -> _snackBarMessage.emit(result.message)
+            )) {
+                is Result.Error -> {
+                    _isSaving.value = false
+                    _snackBarMessage.emit(result.message)
+                }
                 is Result.Success -> {
                     val saved = result.data
+                    if (!isClose) {
+                        _isSaving.value = false
+                        _uiState.value = state.copy(
+                            lineupId = saved.id,
+                            isClosed = saved.isClosed,
+                            playerIds = saved.playerIds,
+                            coachId = saved.coach?.coachId,
+                            physicalTrainerId = saved.physicalTrainer?.physicalTrainerId
+                        )
+                        _snackBarMessage.emit("Planilla guardada como borrador")
+                    } else {
+                        // Cerrar una planilla recién creada exige llamar al endpoint
+                        // de cierre: solo guardar la deja en OPEN en el backend.
+                        when (val closeResult = closeLineupUseCase(saved.id)) {
+                            is Result.Error -> {
+                                _isSaving.value = false
+                                _uiState.value = state.copy(
+                                    lineupId = saved.id,
+                                    isClosed = saved.isClosed,
+                                    playerIds = saved.playerIds,
+                                    coachId = saved.coach?.coachId,
+                                    physicalTrainerId = saved.physicalTrainer?.physicalTrainerId
+                                )
+                                _snackBarMessage.emit(closeResult.message)
+                            }
+                            is Result.Success -> refreshFromServer("Planilla cerrada definitivamente")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Recarga la planilla desde el backend para que [LineupUiState.Success.isClosed]
+     * refleje el estado real (CLOSE). Así la planilla queda bloqueada aunque se
+     * salga de la pantalla y se vuelva a entrar.
+     */
+    private suspend fun refreshFromServer(successMessage: String) {
+        when (val result = getLineupUseCase(matchId.value, sessionManager.clubId)) {
+            is Result.Error -> {
+                _isSaving.value = false
+                _snackBarMessage.emit(result.message)
+            }
+            is Result.Success -> {
+                _isSaving.value = false
+                val lineup = result.data
+                val state = currentSuccessState()
+                if (state != null) {
                     _uiState.value = state.copy(
-                        lineupId = saved.id,
-                        isClosed = isClose,
-                        playerIds = saved.playerIds,
-                        coachId = saved.coach?.coachId,
-                        physicalTrainerId = saved.physicalTrainer?.physicalTrainerId
-                    )
-                    _snackBarMessage.emit(
-                        if (isClose) "Planilla cerrada definitivamente" else "Planilla guardada como borrador"
+                        lineupId = lineup?.id ?: state.lineupId,
+                        // Si el cierre tuvo éxito el registro existe; si por algún
+                        // motivo ya no vuelve, no reabrir la edición por seguridad.
+                        isClosed = lineup?.isClosed ?: true,
+                        playerIds = lineup?.playerIds ?: state.playerIds,
+                        coachId = lineup?.coach?.coachId ?: state.coachId,
+                        physicalTrainerId = lineup?.physicalTrainer?.physicalTrainerId
+                            ?: state.physicalTrainerId
                     )
                 }
+                _snackBarMessage.emit(successMessage)
             }
         }
     }

@@ -72,8 +72,8 @@ class LineupApiService(
 
     override suspend fun close(id: Long): Result<Unit> {
         return try {
-            val response = client.post {
-                url("$baseUrl/$id/close")
+            val response = client.put {
+                url("$baseUrl/close/$id")
             }
             if (!response.status.isSuccess()) {
                 return Result.Error("Error al cerrar planilla: ${response.status}")

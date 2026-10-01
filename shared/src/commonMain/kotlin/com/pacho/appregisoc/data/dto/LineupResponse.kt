@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class LineupStatus {
-    @SerialName("DRAFT") DRAFT,
-    @SerialName("CLOSED") CLOSED
+    @SerialName("OPEN") OPEN,
+    @SerialName("CLOSE") CLOSE
 }
 
 @Serializable
@@ -23,10 +23,17 @@ data class LineupResponse(
     val createdAt: LocalDateTime,
     @SerialName("updatedAt")
     @Serializable(with = LocalDateTimeAsStringSerializer::class)
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+    val status: LineupStatus = LineupStatus.OPEN
 ) {
     val playerIds: Set<Long>
         get() = players.map { it.playerId }.toSet()
+
+    val isOpen: Boolean
+        get() = status == LineupStatus.OPEN
+
+    val isClosed: Boolean
+        get() = status == LineupStatus.CLOSE
 }
 
 @Serializable

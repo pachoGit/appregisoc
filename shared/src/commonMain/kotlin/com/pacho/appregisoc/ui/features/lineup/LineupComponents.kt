@@ -27,20 +27,20 @@ import com.pacho.appregisoc.data.dto.PlayerResponse
 
 internal val LineupStatus.displayLabel: String
     get() = when (this) {
-        LineupStatus.DRAFT -> "Borrador"
-        LineupStatus.CLOSED -> "Cerrada"
+        LineupStatus.OPEN -> "Abierta"
+        LineupStatus.CLOSE -> "Cerrada"
     }
 
 internal val LineupStatus.statusColor: Color
     get() = when (this) {
-        LineupStatus.DRAFT -> Color(0xFFF57F17)
-        LineupStatus.CLOSED -> Color(0xFF2E7D32)
+        LineupStatus.OPEN -> Color(0xFFF57F17)
+        LineupStatus.CLOSE -> Color(0xFF2E7D32)
     }
 
 internal val LineupStatus.statusIcon: ImageVector
     get() = when (this) {
-        LineupStatus.DRAFT -> Icons.Default.Edit
-        LineupStatus.CLOSED -> Icons.Default.Lock
+        LineupStatus.OPEN -> Icons.Default.Edit
+        LineupStatus.CLOSE -> Icons.Default.Lock
     }
 
 internal val PlayerPosition.label: String
@@ -243,17 +243,17 @@ internal fun LineupPlayerRow(
 
 @Preview
 @Composable
-private fun LineupStatusBadgeDraftPreview() {
+private fun LineupStatusBadgeOpenPreview() {
     MaterialTheme {
-        LineupStatusBadge(status = LineupStatus.DRAFT)
+        LineupStatusBadge(status = LineupStatus.OPEN)
     }
 }
 
 @Preview
 @Composable
-private fun LineupStatusBadgeClosedPreview() {
+private fun LineupStatusBadgeClosePreview() {
     MaterialTheme {
-        LineupStatusBadge(status = LineupStatus.CLOSED)
+        LineupStatusBadge(status = LineupStatus.CLOSE)
     }
 }
 

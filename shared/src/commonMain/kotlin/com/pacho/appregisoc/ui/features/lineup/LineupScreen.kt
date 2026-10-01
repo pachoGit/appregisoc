@@ -316,7 +316,7 @@ private fun LineupHeaderCard(
                     modifier = Modifier.weight(1f)
                 )
                 LineupStatusBadge(
-                    status = if (editable) LineupStatus.DRAFT else LineupStatus.CLOSED
+                    status = if (editable) LineupStatus.OPEN else LineupStatus.CLOSE
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
